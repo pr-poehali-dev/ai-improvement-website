@@ -142,7 +142,7 @@ const Index = () => {
                 <Icon name="GraduationCap" className="text-white" size={28} />
               </div>
               <div>
-                <h1 className="text-3xl font-bold tracking-tight">EduAI</h1>
+                <h1 className="text-3xl font-bold tracking-tight">Магистраль знаний</h1>
                 <p className="text-sm text-muted-foreground">Платформа для успешного обучения</p>
               </div>
             </div>
