@@ -15,6 +15,7 @@ const Index = () => {
   const [testCompleted, setTestCompleted] = useState(false);
   const [userAnswers, setUserAnswers] = useState<number[]>([]);
   const [showResult, setShowResult] = useState(false);
+  const [selectedLecture, setSelectedLecture] = useState<{title: string; content: string; duration: string} | null>(null);
 
   const testQuestions = [
     {
@@ -187,19 +188,192 @@ const Index = () => {
           title: 'Основы переменного тока',
           duration: '45 мин',
           description: 'Понятие переменного тока, амплитуда, частота, период',
-          link: '#'
+          content: `# Основы переменного тока
+
+## Введение
+
+Переменный ток — это электрический ток, который периодически изменяется по величине и направлению.
+
+## Основные понятия
+
+**Амплитуда (Im)** — максимальное значение тока за период.
+
+**Период (T)** — время одного полного колебания тока.
+
+**Частота (f)** — количество колебаний в секунду, измеряется в Герцах (Гц). Связана с периодом формулой: f = 1/T
+
+**Угловая частота (ω)** — скорость изменения фазы колебаний: ω = 2πf
+
+## Математическое описание
+
+Мгновенное значение переменного тока описывается синусоидальной функцией:
+
+i(t) = Im × sin(ωt + φ)
+
+где:
+- i(t) — мгновенное значение тока
+- Im — амплитуда тока
+- ω — угловая частота
+- t — время
+- φ — начальная фаза
+
+## Действующее значение
+
+Действующее (эффективное) значение переменного тока — это такое значение постоянного тока, при котором выделяется такая же мощность:
+
+I = Im / √2 ≈ 0,707 × Im
+
+Аналогично для напряжения: U = Um / √2
+
+## Преимущества переменного тока
+
+1. Легко трансформируется
+2. Экономичная передача на большие расстояния
+3. Простота генерации
+4. Возможность изменения параметров
+
+## Применение
+
+Переменный ток используется в:
+- Электроснабжении городов и предприятий
+- Бытовых электроприборах
+- Промышленном оборудовании
+- Системах связи`
         },
         {
           title: 'Реактивные сопротивления',
           duration: '50 мин',
           description: 'Индуктивное и емкостное сопротивления, фазовые сдвиги',
-          link: '#'
+          content: `# Реактивные сопротивления
+
+## Введение
+
+Реактивное сопротивление — это сопротивление элементов электрической цепи, обусловленное реакцией на изменение тока или напряжения.
+
+## Индуктивное сопротивление (XL)
+
+Индуктивность препятствует изменению тока в цепи.
+
+**Формула:** XL = ωL = 2πfL
+
+где:
+- XL — индуктивное сопротивление (Ом)
+- ω — угловая частота
+- L — индуктивность (Генри)
+- f — частота (Гц)
+
+**Особенности:**
+- Ток отстает от напряжения на 90°
+- С ростом частоты сопротивление увеличивается
+- Не потребляет активную мощность
+
+## Емкостное сопротивление (XC)
+
+Емкость также создает реактивное сопротивление переменному току.
+
+**Формула:** XC = 1/(ωC) = 1/(2πfC)
+
+где:
+- XC — емкостное сопротивление (Ом)
+- C — емкость (Фарады)
+
+**Особенности:**
+- Ток опережает напряжение на 90°
+- С ростом частоты сопротивление уменьшается
+- Не потребляет активную мощность
+
+## Фазовые сдвиги
+
+**В индуктивной цепи:** φ = +90° (ток отстает)
+
+**В емкостной цепи:** φ = -90° (ток опережает)
+
+**В комбинированной цепи:** φ зависит от соотношения XL и XC
+
+## Полное сопротивление (импеданс)
+
+Для последовательной RLC-цепи:
+
+Z = √(R² + (XL - XC)²)
+
+где:
+- Z — полное сопротивление
+- R — активное сопротивление
+
+## Практическое значение
+
+Реактивные сопротивления используются в:
+- Фильтрах частот
+- Колебательных контурах
+- Источниках питания
+- Системах согласования`
         },
         {
           title: 'Резонанс в цепях переменного тока',
           duration: '40 мин',
           description: 'Последовательный и параллельный резонанс, практические применения',
-          link: '#'
+          content: `# Резонанс в цепях переменного тока
+
+## Что такое резонанс?
+
+Резонанс — это явление резкого возрастания амплитуды колебаний при совпадении частоты внешнего воздействия с собственной частотой колебательной системы.
+
+## Последовательный резонанс (резонанс напряжений)
+
+**Условие резонанса:** XL = XC
+
+При резонансе:
+- Полное сопротивление минимально: Z = R
+- Ток максимальный: I = U/R
+- Напряжения на L и C могут превышать напряжение источника
+- Фазовый сдвиг равен нулю
+
+**Резонансная частота:**
+
+f₀ = 1/(2π√(LC))
+
+**Добротность контура:**
+
+Q = (ωL)/R = 1/(ωCR)
+
+Чем выше добротность, тем острее резонансная кривая.
+
+## Параллельный резонанс (резонанс токов)
+
+**Условие резонанса:** BL = BC (реактивные проводимости равны)
+
+При резонансе:
+- Полное сопротивление максимально
+- Ток от источника минимальный
+- Токи в ветвях L и C могут быть очень большими
+- Контур имеет чисто активное сопротивление
+
+## Практические применения
+
+### Радиоприемники
+Используют резонанс для выделения сигнала нужной частоты из множества радиоволн.
+
+### Генераторы
+Обеспечивают устойчивую генерацию колебаний определенной частоты.
+
+### Фильтры
+- Полосовые фильтры (пропускают узкий диапазон частот)
+- Режекторные фильтры (подавляют определенную частоту)
+
+### Беспроводная передача энергии
+Используется резонанс для эффективной передачи энергии.
+
+### Измерительная техника
+Резонансные методы измерения L и C.
+
+## Опасность резонанса
+
+В энергетических системах резонанс может привести к:
+- Перенапряжениям
+- Выходу оборудования из строя
+- Аварийным ситуациям
+
+Поэтому необходимо учитывать резонансные явления при проектировании электрических систем.`
         }
       ]
     },
@@ -455,10 +629,14 @@ const Index = () => {
                             <span className="text-sm font-semibold">Рекомендуемые лекции:</span>
                           </div>
                           {rec.lectures.map((lecture, lectureIndex) => (
-                            <a
+                            <button
                               key={lectureIndex}
-                              href={lecture.link}
-                              className="block p-3 rounded-lg bg-card border border-border hover:border-primary/50 hover:shadow-md transition-all group"
+                              onClick={() => setSelectedLecture({
+                                title: lecture.title,
+                                content: lecture.content,
+                                duration: lecture.duration
+                              })}
+                              className="block w-full p-3 rounded-lg bg-card border border-border hover:border-primary/50 hover:shadow-md transition-all group text-left"
                             >
                               <div className="flex items-start justify-between gap-3">
                                 <div className="flex-1">
@@ -473,7 +651,7 @@ const Index = () => {
                                   {lecture.duration}
                                 </Badge>
                               </div>
-                            </a>
+                            </button>
                           ))}
                         </div>
                       )}
@@ -819,6 +997,65 @@ const Index = () => {
           </TabsContent>
         </Tabs>
       </div>
+
+      {selectedLecture && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
+          <Card className="w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl">
+            <div className="flex items-center justify-between p-6 border-b bg-gradient-to-r from-primary/10 to-secondary/10">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-md">
+                  <Icon name="BookOpen" className="text-white" size={20} />
+                </div>
+                <div>
+                  <h2 className="text-2xl font-bold">{selectedLecture.title}</h2>
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
+                    <Icon name="Clock" size={14} />
+                    <span>{selectedLecture.duration}</span>
+                  </div>
+                </div>
+              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setSelectedLecture(null)}
+                className="rounded-full hover:bg-destructive/10 hover:text-destructive"
+              >
+                <Icon name="X" size={24} />
+              </Button>
+            </div>
+            <div className="flex-1 overflow-y-auto p-6">
+              <div className="prose prose-slate max-w-none">
+                {selectedLecture.content.split('\n').map((line, index) => {
+                  if (line.startsWith('# ')) {
+                    return <h1 key={index} className="text-3xl font-bold mb-4 mt-6">{line.substring(2)}</h1>;
+                  } else if (line.startsWith('## ')) {
+                    return <h2 key={index} className="text-2xl font-bold mb-3 mt-5">{line.substring(3)}</h2>;
+                  } else if (line.startsWith('### ')) {
+                    return <h3 key={index} className="text-xl font-bold mb-2 mt-4">{line.substring(4)}</h3>;
+                  } else if (line.startsWith('**') && line.endsWith('**')) {
+                    return <p key={index} className="font-bold mb-2">{line.substring(2, line.length - 2)}</p>;
+                  } else if (line.startsWith('- ')) {
+                    return <li key={index} className="ml-4 mb-1">{line.substring(2)}</li>;
+                  } else if (line.trim() === '') {
+                    return <div key={index} className="h-2"></div>;
+                  } else {
+                    return <p key={index} className="mb-2 text-muted-foreground">{line}</p>;
+                  }
+                })}
+              </div>
+            </div>
+            <div className="p-6 border-t bg-muted/30">
+              <Button
+                onClick={() => setSelectedLecture(null)}
+                className="w-full"
+                size="lg"
+              >
+                Закрыть лекцию
+              </Button>
+            </div>
+          </Card>
+        </div>
+      )}
     </div>
   );
 };
