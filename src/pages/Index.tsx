@@ -20,6 +20,12 @@ const Index = () => {
   const [selectedLecture, setSelectedLecture] = useState<{title: string; content: string; duration: string} | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userName, setUserName] = useState('');
+  const [userProgress, setUserProgress] = useState({
+    testsCompleted: 0,
+    averageScore: 0,
+    testResults: []
+  });
+  const [loadingProgress, setLoadingProgress] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem('auth_token');
@@ -30,8 +36,41 @@ const Index = () => {
       const user = JSON.parse(userStr);
       const firstName = user.full_name.trim().split(' ')[0];
       setUserName(firstName);
+      loadUserProgress(token);
     }
   }, []);
+
+  const loadUserProgress = async (token: string) => {
+    setLoadingProgress(true);
+    try {
+      const response = await fetch('https://functions.poehali.dev/6f04f0e4-6b9b-4b83-9359-a67eb64cd803', {
+        method: 'GET',
+        headers: {
+          'X-Auth-Token': token
+        }
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.user) {
+        const testResults = data.user.test_results || [];
+        const testsCompleted = testResults.length;
+        const averageScore = testsCompleted > 0 
+          ? Math.round(testResults.reduce((sum: number, test: any) => sum + test.score, 0) / testsCompleted)
+          : 0;
+
+        setUserProgress({
+          testsCompleted,
+          averageScore,
+          testResults
+        });
+      }
+    } catch (error) {
+      console.error('Ошибка загрузки прогресса:', error);
+    } finally {
+      setLoadingProgress(false);
+    }
+  };
 
   const testQuestions = [
     {
@@ -1373,6 +1412,8 @@ P_max = I²R = 2² × 3 = 12 Вт
                   correct_answers: correct
                 })
               });
+              
+              loadUserProgress(token);
             } catch (error) {
               console.error('Ошибка сохранения результата:', error);
             }
@@ -1483,7 +1524,9 @@ P_max = I²R = 2² × 3 = 12 Вт
                     <div className="absolute inset-0 rounded-full bg-gradient-to-br from-primary/30 to-secondary/20 animate-pulse"></div>
                     <div className="absolute inset-4 rounded-full bg-gradient-to-br from-primary/40 to-secondary/30 flex items-center justify-center shadow-inner">
                       <div className="text-center">
-                        <div className="text-5xl font-bold text-primary">{studentStats.averageScore}</div>
+                        <div className="text-5xl font-bold text-primary">
+                          {isAuthenticated ? userProgress.averageScore : studentStats.averageScore}
+                        </div>
                         <div className="text-sm text-muted-foreground">Средний балл</div>
                       </div>
                     </div>
@@ -1499,7 +1542,9 @@ P_max = I²R = 2² × 3 = 12 Вт
                     <Icon name="CheckCircle" className="text-primary" size={24} />
                   </div>
                   <div>
-                    <div className="text-3xl font-bold">{studentStats.testsCompleted}</div>
+                    <div className="text-3xl font-bold">
+                      {isAuthenticated ? userProgress.testsCompleted : studentStats.testsCompleted}
+                    </div>
                     <div className="text-sm text-muted-foreground">Тестов пройдено</div>
                   </div>
                 </div>
