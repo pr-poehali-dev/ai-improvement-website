@@ -88,8 +88,8 @@ export default function Profile() {
     );
   }
 
-  const completedTests = user.test_results.length;
-  const completedTopics = user.completed_topics.length;
+  const completedTests = (user.test_results && Array.isArray(user.test_results)) ? user.test_results.length : 0;
+  const completedTopics = (user.completed_topics && Array.isArray(user.completed_topics)) ? user.completed_topics.length : 0;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-secondary/10">
@@ -108,7 +108,7 @@ export default function Profile() {
         <div className="bg-white rounded-2xl shadow-xl p-8 border border-border mb-6">
           <div className="flex items-start gap-6 mb-8">
             <div className="w-24 h-24 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white text-3xl font-bold">
-              {user.full_name.charAt(0).toUpperCase()}
+              {user.full_name.trim().split(' ')[0].charAt(0).toUpperCase()}
             </div>
             <div className="flex-1">
               <h1 className="text-3xl font-bold mb-2">{user.full_name}</h1>
@@ -164,7 +164,7 @@ export default function Profile() {
           </div>
         </div>
 
-        {user.test_results.length > 0 && (
+        {user.test_results && user.test_results.length > 0 && (
           <div className="bg-white rounded-2xl shadow-xl p-8 border border-border">
             <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
               <Icon name="History" size={24} />

@@ -28,7 +28,8 @@ const Index = () => {
     if (token && userStr) {
       setIsAuthenticated(true);
       const user = JSON.parse(userStr);
-      setUserName(user.full_name);
+      const firstName = user.full_name.trim().split(' ')[0];
+      setUserName(firstName);
     }
   }, []);
 
@@ -1461,7 +1462,7 @@ P_max = I²R = 2² × 3 = 12 Вт
               <div className="flex flex-col md:flex-row items-center gap-6">
                 <div className="flex-1">
                   <h2 className="text-3xl font-bold mb-3">
-                    Привет, {isAuthenticated ? userName.split(' ')[0] : studentStats.name.split(' ')[0]}! 👋
+                    Привет, {isAuthenticated ? userName : studentStats.name.split(' ')[0]}! 👋
                   </h2>
                   <p className="text-lg text-muted-foreground mb-6">
                     Твой ИИ-помощник готов помочь улучшить успеваемость
