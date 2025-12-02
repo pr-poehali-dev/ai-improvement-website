@@ -133,7 +133,7 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
+    <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-secondary/10">
       <div className="container mx-auto px-4 py-8 max-w-7xl">
         <header className="mb-12 animate-fade-in">
           <div className="flex items-center justify-between mb-8">
@@ -174,7 +174,7 @@ const Index = () => {
           </TabsList>
 
           <TabsContent value="home" className="space-y-6 animate-fade-in">
-            <Card className="p-8 bg-gradient-to-br from-primary/10 to-secondary/10 border-primary/20">
+            <Card className="p-8 bg-gradient-to-br from-primary/15 via-primary/10 to-secondary/15 border-primary/30 shadow-lg">
               <div className="flex flex-col md:flex-row items-center gap-6">
                 <div className="flex-1">
                   <h2 className="text-3xl font-bold mb-3">
@@ -196,8 +196,8 @@ const Index = () => {
                 </div>
                 <div className="w-full md:w-auto">
                   <div className="relative w-48 h-48 mx-auto">
-                    <div className="absolute inset-0 rounded-full bg-primary/20 animate-pulse"></div>
-                    <div className="absolute inset-4 rounded-full bg-primary/30 flex items-center justify-center">
+                    <div className="absolute inset-0 rounded-full bg-gradient-to-br from-primary/30 to-secondary/20 animate-pulse"></div>
+                    <div className="absolute inset-4 rounded-full bg-gradient-to-br from-primary/40 to-secondary/30 flex items-center justify-center shadow-inner">
                       <div className="text-center">
                         <div className="text-5xl font-bold text-primary">{studentStats.averageScore}</div>
                         <div className="text-sm text-muted-foreground">Средний балл</div>
@@ -209,9 +209,9 @@ const Index = () => {
             </Card>
 
             <div className="grid md:grid-cols-3 gap-6">
-              <Card className="p-6 hover:shadow-lg transition-shadow">
+              <Card className="p-6 hover:shadow-xl transition-all hover:scale-105">
                 <div className="flex items-center gap-4 mb-4">
-                  <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center shadow-md">
                     <Icon name="CheckCircle" className="text-primary" size={24} />
                   </div>
                   <div>
@@ -221,9 +221,9 @@ const Index = () => {
                 </div>
               </Card>
 
-              <Card className="p-6 hover:shadow-lg transition-shadow">
+              <Card className="p-6 hover:shadow-xl transition-all hover:scale-105">
                 <div className="flex items-center gap-4 mb-4">
-                  <div className="w-12 h-12 rounded-lg bg-secondary/10 flex items-center justify-center">
+                  <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-secondary/30 to-secondary/20 flex items-center justify-center shadow-md">
                     <Icon name="TrendingUp" className="text-secondary" size={24} />
                   </div>
                   <div>
@@ -233,9 +233,9 @@ const Index = () => {
                 </div>
               </Card>
 
-              <Card className="p-6 hover:shadow-lg transition-shadow">
+              <Card className="p-6 hover:shadow-xl transition-all hover:scale-105">
                 <div className="flex items-center gap-4 mb-4">
-                  <div className="w-12 h-12 rounded-lg bg-accent/10 flex items-center justify-center">
+                  <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-primary/25 to-secondary/15 flex items-center justify-center shadow-md">
                     <Icon name="Target" className="text-accent" size={24} />
                   </div>
                   <div>
@@ -246,18 +246,20 @@ const Index = () => {
               </Card>
             </div>
 
-            <Card className="p-8">
+            <Card className="p-8 bg-gradient-to-br from-card via-primary/5 to-secondary/5 shadow-md">
               <div className="flex items-center gap-3 mb-6">
-                <Icon name="Sparkles" className="text-primary" size={24} />
+                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-md">
+                  <Icon name="Sparkles" className="text-white" size={24} />
+                </div>
                 <h3 className="text-2xl font-bold">Рекомендации ИИ</h3>
               </div>
               <div className="space-y-4">
                 {aiRecommendations.map((rec, index) => (
                   <div
                     key={index}
-                    className="flex items-start gap-4 p-4 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
+                    className="flex items-start gap-4 p-4 rounded-lg bg-gradient-to-r from-muted/50 to-secondary/10 hover:from-muted hover:to-secondary/20 transition-all hover:shadow-md border border-transparent hover:border-primary/20"
                   >
-                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/20 to-secondary/10 flex items-center justify-center flex-shrink-0 shadow-sm">
                       <Icon name="Lightbulb" className="text-primary" size={20} />
                     </div>
                     <div className="flex-1">
@@ -289,9 +291,9 @@ const Index = () => {
 
           <TabsContent value="tests" className="animate-fade-in">
             {!testStarted ? (
-              <Card className="p-8 text-center">
+              <Card className="p-8 text-center bg-gradient-to-br from-card via-primary/5 to-secondary/10 shadow-lg">
                 <div className="max-w-2xl mx-auto">
-                  <div className="w-24 h-24 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <div className="w-24 h-24 bg-gradient-to-br from-primary/20 to-secondary/10 rounded-full flex items-center justify-center mx-auto mb-6 shadow-md">
                     <Icon name="ClipboardList" className="text-primary" size={48} />
                   </div>
                   <h2 className="text-3xl font-bold mb-4">Готовы начать тест?</h2>
@@ -299,18 +301,18 @@ const Index = () => {
                     Тест содержит {testQuestions.length} вопросов. Выберите один правильный ответ для каждого вопроса.
                   </p>
                   <div className="grid md:grid-cols-3 gap-4 mb-8">
-                    <div className="p-4 bg-muted/50 rounded-lg">
+                    <div className="p-4 bg-gradient-to-br from-primary/10 to-secondary/5 rounded-lg shadow-sm hover:shadow-md transition-shadow">
                       <Icon name="HelpCircle" className="mx-auto mb-2 text-primary" size={32} />
                       <div className="font-bold text-2xl">{testQuestions.length}</div>
                       <div className="text-sm text-muted-foreground">Вопросов</div>
                     </div>
-                    <div className="p-4 bg-muted/50 rounded-lg">
+                    <div className="p-4 bg-gradient-to-br from-secondary/15 to-secondary/5 rounded-lg shadow-sm hover:shadow-md transition-shadow">
                       <Icon name="Clock" className="mx-auto mb-2 text-secondary" size={32} />
                       <div className="font-bold text-2xl">10</div>
                       <div className="text-sm text-muted-foreground">Минут</div>
                     </div>
-                    <div className="p-4 bg-muted/50 rounded-lg">
-                      <Icon name="Target" className="mx-auto mb-2 text-accent" size={32} />
+                    <div className="p-4 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-lg shadow-sm hover:shadow-md transition-shadow">
+                      <Icon name="Target" className="mx-auto mb-2 text-primary" size={32} />
                       <div className="font-bold text-2xl">100</div>
                       <div className="text-sm text-muted-foreground">Макс. баллов</div>
                     </div>
@@ -322,10 +324,10 @@ const Index = () => {
                 </div>
               </Card>
             ) : showResult ? (
-              <Card className="p-8">
+              <Card className="p-8 bg-gradient-to-br from-card via-primary/5 to-secondary/10 shadow-lg">
                 <div className="max-w-2xl mx-auto text-center">
-                  <div className={`w-32 h-32 rounded-full flex items-center justify-center mx-auto mb-6 ${
-                    calculateScore() >= 80 ? 'bg-secondary/20' : calculateScore() >= 60 ? 'bg-accent/20' : 'bg-destructive/20'
+                  <div className={`w-32 h-32 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg ${
+                    calculateScore() >= 80 ? 'bg-gradient-to-br from-secondary/30 to-secondary/20' : calculateScore() >= 60 ? 'bg-gradient-to-br from-primary/20 to-secondary/15' : 'bg-gradient-to-br from-destructive/30 to-destructive/20'
                   }`}>
                     <Icon 
                       name={calculateScore() >= 80 ? 'Trophy' : calculateScore() >= 60 ? 'Award' : 'AlertCircle'} 
@@ -336,7 +338,7 @@ const Index = () => {
                   <h2 className="text-3xl font-bold mb-4">
                     {calculateScore() >= 80 ? 'Отлично!' : calculateScore() >= 60 ? 'Хорошо!' : 'Нужно подтянуть'}
                   </h2>
-                  <div className="text-6xl font-bold text-primary mb-4">{calculateScore()}%</div>
+                  <div className="text-6xl font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent mb-4">{calculateScore()}%</div>
                   <p className="text-lg text-muted-foreground mb-8">
                     Вы правильно ответили на {userAnswers.filter((ans, idx) => ans === testQuestions[idx].correct).length} из {testQuestions.length} вопросов
                   </p>
@@ -346,8 +348,8 @@ const Index = () => {
                     {testQuestions.map((q, idx) => {
                       const isCorrect = userAnswers[idx] === q.correct;
                       return (
-                        <div key={idx} className={`p-4 rounded-lg border-2 ${
-                          isCorrect ? 'border-secondary bg-secondary/5' : 'border-destructive bg-destructive/5'
+                        <div key={idx} className={`p-4 rounded-lg border-2 shadow-sm transition-shadow hover:shadow-md ${
+                          isCorrect ? 'border-secondary/30 bg-gradient-to-r from-secondary/10 to-secondary/5' : 'border-destructive/30 bg-gradient-to-r from-destructive/10 to-destructive/5'
                         }`}>
                           <div className="flex items-start gap-3">
                             <Icon 
@@ -390,18 +392,18 @@ const Index = () => {
                 </div>
               </Card>
             ) : (
-              <Card className="p-8">
+              <Card className="p-8 bg-gradient-to-br from-card to-primary/5 shadow-lg">
                 <div className="mb-8">
                   <div className="flex items-center justify-between mb-4">
                     <h2 className="text-2xl font-bold">
                       Вопрос {currentQuestion + 1} из {testQuestions.length}
                     </h2>
-                    <Badge variant="outline" className="text-lg px-4 py-2">
+                    <Badge variant="outline" className="text-lg px-4 py-2 bg-gradient-to-r from-primary/10 to-secondary/10">
                       <Icon name="Brain" size={16} className="mr-2" />
                       Тест по предметам
                     </Badge>
                   </div>
-                  <Progress value={((currentQuestion + 1) / testQuestions.length) * 100} className="h-2" />
+                  <Progress value={((currentQuestion + 1) / testQuestions.length) * 100} className="h-3" />
                 </div>
 
                 <div className="mb-8">
@@ -411,16 +413,16 @@ const Index = () => {
                       <button
                         key={index}
                         onClick={() => handleAnswerSelect(index)}
-                        className={`w-full p-4 text-left rounded-lg border-2 transition-all hover-scale ${
+                        className={`w-full p-4 text-left rounded-lg border-2 transition-all hover:scale-[1.02] shadow-sm hover:shadow-md ${
                           selectedAnswer === index
-                            ? 'border-primary bg-primary/10'
-                            : 'border-border hover:border-primary/50 hover:bg-muted/50'
+                            ? 'border-primary bg-gradient-to-r from-primary/15 to-secondary/10 shadow-md'
+                            : 'border-border hover:border-primary/50 hover:bg-gradient-to-r hover:from-muted/50 hover:to-primary/5'
                         }`}
                       >
                         <div className="flex items-center gap-3">
                           <div
-                            className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
-                              selectedAnswer === index ? 'border-primary bg-primary' : 'border-muted-foreground'
+                            className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shadow-sm ${
+                              selectedAnswer === index ? 'border-primary bg-gradient-to-br from-primary to-primary/80' : 'border-muted-foreground'
                             }`}
                           >
                             {selectedAnswer === index && <div className="w-3 h-3 rounded-full bg-white"></div>}
