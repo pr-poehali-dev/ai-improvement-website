@@ -18,34 +18,50 @@ const Index = () => {
 
   const testQuestions = [
     {
-      question: 'Какая формула описывает второй закон Ньютона?',
-      answers: ['F = ma', 'E = mc²', 'V = IR', 'PV = nRT'],
-      correct: 0
+      question: 'Какой закон описывает соотношение напряжения, тока и сопротивления в цепи постоянного тока?',
+      answers: ['Закон Ома', 'Закон Кирхгофа', 'Закон Джоуля-Ленца', 'Закон Фарадея'],
+      correct: 0,
+      topic: 'Электрические цепи постоянного тока'
     },
     {
-      question: 'Что такое производная функции?',
+      question: 'Чему равна мощность в цепи постоянного тока?',
+      answers: ['P = UI', 'P = I²R', 'P = U²/R', 'Все варианты верны'],
+      correct: 3,
+      topic: 'Электрические цепи постоянного тока'
+    },
+    {
+      question: 'Что характеризует реактивное сопротивление конденсатора в цепи переменного тока?',
       answers: [
-        'Скорость изменения функции',
-        'Площадь под графиком',
-        'Корень уравнения',
-        'Максимум функции'
+        'Xc = 1/(ωC)',
+        'Xc = ωC',
+        'Xc = ωL',
+        'Xc = R'
       ],
-      correct: 0
+      correct: 0,
+      topic: 'Электрические цепи переменного тока'
     },
     {
-      question: 'Какой элемент имеет химический символ O?',
-      answers: ['Водород', 'Кислород', 'Азот', 'Углерод'],
-      correct: 1
+      question: 'Какая величина измеряется в Фарадах?',
+      answers: ['Сопротивление', 'Индуктивность', 'Емкость', 'Напряжение'],
+      correct: 2,
+      topic: 'Конденсаторы'
     },
     {
-      question: 'Сколько будет 15 × 8?',
-      answers: ['100', '110', '120', '130'],
-      correct: 2
+      question: 'Как изменится ток в цепи переменного тока при увеличении частоты, если в цепи есть конденсатор?',
+      answers: ['Увеличится', 'Уменьшится', 'Не изменится', 'Станет равным нулю'],
+      correct: 0,
+      topic: 'Электрические цепи переменного тока'
     },
     {
-      question: 'Кто написал "Войну и мир"?',
-      answers: ['Достоевский', 'Пушкин', 'Толстой', 'Чехов'],
-      correct: 2
+      question: 'Что происходит при последовательном соединении конденсаторов?',
+      answers: [
+        'Общая емкость увеличивается',
+        'Общая емкость уменьшается',
+        'Общая емкость не изменяется',
+        'Напряжение становится одинаковым'
+      ],
+      correct: 1,
+      topic: 'Конденсаторы'
     }
   ];
 
@@ -54,32 +70,30 @@ const Index = () => {
     grade: '10 класс',
     testsCompleted: 24,
     averageScore: 85,
-    strongSubjects: ['Математика', 'Физика'],
-    weakSubjects: ['История', 'Литература']
+    strongSubjects: ['Электрические цепи постоянного тока', 'Конденсаторы'],
+    weakSubjects: ['Электрические цепи переменного тока']
   };
 
   const progressData = [
-    { subject: 'Математика', score: 92, trend: 'up' },
-    { subject: 'Физика', score: 88, trend: 'up' },
-    { subject: 'Химия', score: 78, trend: 'stable' },
-    { subject: 'История', score: 65, trend: 'down' },
-    { subject: 'Литература', score: 70, trend: 'up' }
+    { subject: 'Электрические цепи постоянного тока', score: 92, trend: 'up' },
+    { subject: 'Конденсаторы', score: 88, trend: 'up' },
+    { subject: 'Электрические цепи переменного тока', score: 65, trend: 'up' }
   ];
 
   const aiRecommendations = [
     {
-      subject: 'История',
-      suggestion: 'Рекомендую уделить больше внимания датам и событиям XIX века',
+      subject: 'Электрические цепи переменного тока',
+      suggestion: 'Рекомендую уделить внимание реактивным сопротивлениям и резонансным явлениям',
       priority: 'high'
     },
     {
-      subject: 'Литература',
-      suggestion: 'Отлично! Продолжайте читать классические произведения',
+      subject: 'Конденсаторы',
+      suggestion: 'Отлично! Продолжайте практиковать расчеты емкостей при различных соединениях',
       priority: 'low'
     },
     {
-      subject: 'Химия',
-      suggestion: 'Попробуйте решить дополнительные задачи на реакции',
+      subject: 'Электрические цепи постоянного тока',
+      suggestion: 'Попробуйте решить задачи на применение законов Кирхгофа',
       priority: 'medium'
     }
   ];
@@ -228,7 +242,7 @@ const Index = () => {
                   </div>
                   <div>
                     <div className="text-3xl font-bold">{studentStats.strongSubjects.length}</div>
-                    <div className="text-sm text-muted-foreground">Сильных предмета</div>
+                    <div className="text-sm text-muted-foreground">Сильных раздела</div>
                   </div>
                 </div>
               </Card>
@@ -399,8 +413,8 @@ const Index = () => {
                       Вопрос {currentQuestion + 1} из {testQuestions.length}
                     </h2>
                     <Badge variant="outline" className="text-lg px-4 py-2 bg-gradient-to-r from-primary/10 to-secondary/10">
-                      <Icon name="Brain" size={16} className="mr-2" />
-                      Тест по предметам
+                      <Icon name="Zap" size={16} className="mr-2" />
+                      Электротехника
                     </Badge>
                   </div>
                   <Progress value={((currentQuestion + 1) / testQuestions.length) * 100} className="h-3" />
