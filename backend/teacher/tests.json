@@ -1,0 +1,17 @@
+{
+  "tests": [
+    {
+      "name": "Get students list",
+      "method": "GET",
+      "path": "/",
+      "headers": {
+        "X-Auth-Token": "test-teacher-token"
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "students": "array"
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}

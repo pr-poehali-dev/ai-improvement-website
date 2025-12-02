@@ -2,8 +2,11 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import Icon from '@/components/ui/icon';
 
 interface Student {
@@ -13,6 +16,8 @@ interface Student {
   tests_completed: number;
   average_score: number;
   last_activity: string | null;
+  test_results?: any[];
+  completed_topics?: string[];
 }
 
 export default function TeacherDashboard() {
@@ -21,6 +26,14 @@ export default function TeacherDashboard() {
   const [students, setStudents] = useState<Student[]>([]);
   const [loading, setLoading] = useState(true);
   const [teacherName, setTeacherName] = useState('');
+  const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
+  const [showDetailsDialog, setShowDetailsDialog] = useState(false);
+  const [showMessageDialog, setShowMessageDialog] = useState(false);
+  const [showAddDialog, setShowAddDialog] = useState(false);
+  const [message, setMessage] = useState('');
+  const [newStudentEmail, setNewStudentEmail] = useState('');
+  const [sendingMessage, setSendingMessage] = useState(false);
+  const [addingStudent, setAddingStudent] = useState(false);
 
   useEffect(() => {
     const role = localStorage.getItem('user_role');
@@ -38,34 +51,125 @@ export default function TeacherDashboard() {
   }, [navigate]);
 
   const loadStudents = async () => {
-    setLoading(false);
-    const mockStudents: Student[] = [
-      {
-        id: 1,
-        full_name: 'Иван Петров',
-        email: 'ivan@example.com',
-        tests_completed: 15,
-        average_score: 85,
-        last_activity: '2024-12-01T10:30:00'
-      },
-      {
-        id: 2,
-        full_name: 'Мария Сидорова',
-        email: 'maria@example.com',
-        tests_completed: 22,
-        average_score: 92,
-        last_activity: '2024-12-02T14:20:00'
-      },
-      {
-        id: 3,
-        full_name: 'Петр Иванов',
-        email: 'petr@example.com',
-        tests_completed: 8,
-        average_score: 68,
-        last_activity: '2024-11-28T09:15:00'
+    setLoading(true);
+    const token = localStorage.getItem('auth_token');
+    
+    if (!token) {
+      navigate('/login');
+      return;
+    }
+
+    try {
+      const response = await fetch('https://functions.poehali.dev/e6287ede-7b3e-49b4-9586-8da518c65740', {
+        method: 'GET',
+        headers: {
+          'X-Auth-Token': token
+        }
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setStudents(data.students || []);
       }
-    ];
-    setStudents(mockStudents);
+    } catch (error) {
+      console.error('Ошибка загрузки студентов:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadStudentDetails = async (studentId: number) => {
+    const token = localStorage.getItem('auth_token');
+    if (!token) return;
+
+    try {
+      const response = await fetch(`https://functions.poehali.dev/e6287ede-7b3e-49b4-9586-8da518c65740?student_id=${studentId}`, {
+        method: 'GET',
+        headers: {
+          'X-Auth-Token': token
+        }
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setSelectedStudent(data.student);
+        setShowDetailsDialog(true);
+      }
+    } catch (error) {
+      console.error('Ошибка загрузки деталей студента:', error);
+    }
+  };
+
+  const handleSendMessage = async () => {
+    if (!selectedStudent || !message.trim()) return;
+
+    setSendingMessage(true);
+    const token = localStorage.getItem('auth_token');
+
+    try {
+      const response = await fetch('https://functions.poehali.dev/e6287ede-7b3e-49b4-9586-8da518c65740', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Auth-Token': token!
+        },
+        body: JSON.stringify({
+          action: 'send_message',
+          student_id: selectedStudent.id,
+          message: message
+        })
+      });
+
+      if (response.ok) {
+        setMessage('');
+        setShowMessageDialog(false);
+        alert('Сообщение отправлено!');
+      }
+    } catch (error) {
+      console.error('Ошибка отправки сообщения:', error);
+      alert('Не удалось отправить сообщение');
+    } finally {
+      setSendingMessage(false);
+    }
+  };
+
+  const handleAddStudent = async () => {
+    if (!newStudentEmail.trim()) return;
+
+    setAddingStudent(true);
+    const token = localStorage.getItem('auth_token');
+
+    try {
+      const response = await fetch('https://functions.poehali.dev/e6287ede-7b3e-49b4-9586-8da518c65740', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Auth-Token': token!
+        },
+        body: JSON.stringify({
+          action: 'add_student',
+          email: newStudentEmail
+        })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setNewStudentEmail('');
+        setShowAddDialog(false);
+        loadStudents();
+        alert('Студент добавлен!');
+      } else {
+        alert(data.error || 'Не удалось добавить студента');
+      }
+    } catch (error) {
+      console.error('Ошибка добавления студента:', error);
+      alert('Не удалось добавить студента');
+    } finally {
+      setAddingStudent(false);
+    }
   };
 
   const handleLogout = () => {
@@ -82,6 +186,17 @@ export default function TeacherDashboard() {
     if (score >= 50) return { text: 'Удовл.', color: 'bg-yellow-100 text-yellow-700' };
     return { text: 'Требует внимания', color: 'bg-red-100 text-red-700' };
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-secondary/10 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Загрузка...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-secondary/10">
@@ -206,7 +321,14 @@ export default function TeacherDashboard() {
                         <p className="text-2xl font-bold text-orange-600">{student.average_score}%</p>
                         <p className="text-xs text-muted-foreground">{student.tests_completed} тестов</p>
                       </div>
-                      <Button size="sm" variant="outline">
+                      <Button 
+                        size="sm" 
+                        variant="outline"
+                        onClick={() => {
+                          setSelectedStudent(student);
+                          setShowMessageDialog(true);
+                        }}
+                      >
                         <Icon name="MessageCircle" size={16} className="mr-2" />
                         Связаться
                       </Button>
@@ -226,60 +348,81 @@ export default function TeacherDashboard() {
             <Card className="p-6">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-2xl font-bold">Список студентов</h2>
-                <Button className="gap-2">
+                <Button className="gap-2" onClick={() => setShowAddDialog(true)}>
                   <Icon name="UserPlus" size={18} />
                   Добавить студента
                 </Button>
               </div>
-              <div className="space-y-3">
-                {students.map(student => {
-                  const badge = getPerformanceBadge(student.average_score);
-                  return (
-                    <div key={student.id} className="p-5 bg-muted rounded-lg hover:bg-muted/80 transition-colors">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-4 flex-1">
-                          <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white text-xl font-bold">
-                            {student.full_name.split(' ').map(n => n[0]).join('')}
-                          </div>
-                          <div className="flex-1">
-                            <div className="flex items-center gap-3 mb-1">
-                              <p className="font-bold text-lg">{student.full_name}</p>
-                              <Badge className={badge.color}>{badge.text}</Badge>
+              {students.length === 0 ? (
+                <div className="text-center py-12 text-muted-foreground">
+                  <Icon name="Users" size={48} className="mx-auto mb-4 opacity-50" />
+                  <p className="mb-2">У вас пока нет студентов</p>
+                  <p className="text-sm">Нажмите "Добавить студента" чтобы начать</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {students.map(student => {
+                    const badge = getPerformanceBadge(student.average_score);
+                    return (
+                      <div key={student.id} className="p-5 bg-muted rounded-lg hover:bg-muted/80 transition-colors">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-4 flex-1">
+                            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white text-xl font-bold">
+                              {student.full_name.split(' ').map(n => n[0]).join('')}
                             </div>
-                            <p className="text-sm text-muted-foreground mb-2">{student.email}</p>
-                            <div className="flex items-center gap-4 text-sm">
-                              <span className="flex items-center gap-1">
-                                <Icon name="CheckCircle" size={14} className="text-green-600" />
-                                {student.tests_completed} тестов
-                              </span>
-                              <span className="flex items-center gap-1">
-                                <Icon name="Award" size={14} className="text-blue-600" />
-                                {student.average_score}% средний балл
-                              </span>
-                              {student.last_activity && (
+                            <div className="flex-1">
+                              <div className="flex items-center gap-3 mb-1">
+                                <p className="font-bold text-lg">{student.full_name}</p>
+                                <Badge className={badge.color}>{badge.text}</Badge>
+                              </div>
+                              <p className="text-sm text-muted-foreground mb-2">{student.email}</p>
+                              <div className="flex items-center gap-4 text-sm">
                                 <span className="flex items-center gap-1">
-                                  <Icon name="Clock" size={14} className="text-muted-foreground" />
-                                  {new Date(student.last_activity).toLocaleDateString('ru-RU')}
+                                  <Icon name="CheckCircle" size={14} className="text-green-600" />
+                                  {student.tests_completed} тестов
                                 </span>
-                              )}
+                                <span className="flex items-center gap-1">
+                                  <Icon name="Award" size={14} className="text-blue-600" />
+                                  {student.average_score}% средний балл
+                                </span>
+                                {student.last_activity && (
+                                  <span className="flex items-center gap-1">
+                                    <Icon name="Clock" size={14} className="text-muted-foreground" />
+                                    {new Date(student.last_activity).toLocaleDateString('ru-RU')}
+                                  </span>
+                                )}
+                              </div>
                             </div>
                           </div>
-                        </div>
-                        <div className="flex gap-2">
-                          <Button size="sm" variant="outline" className="gap-2">
-                            <Icon name="Eye" size={16} />
-                            Подробнее
-                          </Button>
-                          <Button size="sm" variant="outline" className="gap-2">
-                            <Icon name="MessageCircle" size={16} />
-                            Написать
-                          </Button>
+                          <div className="flex gap-2">
+                            <Button 
+                              size="sm" 
+                              variant="outline" 
+                              className="gap-2"
+                              onClick={() => loadStudentDetails(student.id)}
+                            >
+                              <Icon name="Eye" size={16} />
+                              Подробнее
+                            </Button>
+                            <Button 
+                              size="sm" 
+                              variant="outline" 
+                              className="gap-2"
+                              onClick={() => {
+                                setSelectedStudent(student);
+                                setShowMessageDialog(true);
+                              }}
+                            >
+                              <Icon name="MessageCircle" size={16} />
+                              Написать
+                            </Button>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  );
-                })}
-              </div>
+                    );
+                  })}
+                </div>
+              )}
             </Card>
           </TabsContent>
 
@@ -296,7 +439,7 @@ export default function TeacherDashboard() {
                         <div className="w-32 h-2 bg-muted rounded-full overflow-hidden">
                           <div 
                             className="h-full bg-green-500"
-                            style={{ width: `${(students.filter(s => s.average_score >= 85).length / students.length) * 100}%` }}
+                            style={{ width: students.length > 0 ? `${(students.filter(s => s.average_score >= 85).length / students.length) * 100}%` : '0%' }}
                           />
                         </div>
                         <span className="text-sm font-bold">{students.filter(s => s.average_score >= 85).length}</span>
@@ -308,7 +451,7 @@ export default function TeacherDashboard() {
                         <div className="w-32 h-2 bg-muted rounded-full overflow-hidden">
                           <div 
                             className="h-full bg-blue-500"
-                            style={{ width: `${(students.filter(s => s.average_score >= 70 && s.average_score < 85).length / students.length) * 100}%` }}
+                            style={{ width: students.length > 0 ? `${(students.filter(s => s.average_score >= 70 && s.average_score < 85).length / students.length) * 100}%` : '0%' }}
                           />
                         </div>
                         <span className="text-sm font-bold">{students.filter(s => s.average_score >= 70 && s.average_score < 85).length}</span>
@@ -320,7 +463,7 @@ export default function TeacherDashboard() {
                         <div className="w-32 h-2 bg-muted rounded-full overflow-hidden">
                           <div 
                             className="h-full bg-yellow-500"
-                            style={{ width: `${(students.filter(s => s.average_score >= 50 && s.average_score < 70).length / students.length) * 100}%` }}
+                            style={{ width: students.length > 0 ? `${(students.filter(s => s.average_score >= 50 && s.average_score < 70).length / students.length) * 100}%` : '0%' }}
                           />
                         </div>
                         <span className="text-sm font-bold">{students.filter(s => s.average_score >= 50 && s.average_score < 70).length}</span>
@@ -332,7 +475,7 @@ export default function TeacherDashboard() {
                         <div className="w-32 h-2 bg-muted rounded-full overflow-hidden">
                           <div 
                             className="h-full bg-red-500"
-                            style={{ width: `${(students.filter(s => s.average_score < 50).length / students.length) * 100}%` }}
+                            style={{ width: students.length > 0 ? `${(students.filter(s => s.average_score < 50).length / students.length) * 100}%` : '0%' }}
                           />
                         </div>
                         <span className="text-sm font-bold">{students.filter(s => s.average_score < 50).length}</span>
@@ -404,6 +547,133 @@ export default function TeacherDashboard() {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Student Details Dialog */}
+      <Dialog open={showDetailsDialog} onOpenChange={setShowDetailsDialog}>
+        <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Детали студента</DialogTitle>
+            <DialogDescription>Подробная информация об успеваемости</DialogDescription>
+          </DialogHeader>
+          {selectedStudent && (
+            <div className="space-y-6">
+              <div className="flex items-center gap-4">
+                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white text-2xl font-bold">
+                  {selectedStudent.full_name.split(' ').map(n => n[0]).join('')}
+                </div>
+                <div>
+                  <h3 className="text-2xl font-bold">{selectedStudent.full_name}</h3>
+                  <p className="text-muted-foreground">{selectedStudent.email}</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-3 gap-4">
+                <Card className="p-4">
+                  <div className="text-center">
+                    <div className="text-3xl font-bold text-primary">{selectedStudent.tests_completed}</div>
+                    <div className="text-sm text-muted-foreground">Тестов пройдено</div>
+                  </div>
+                </Card>
+                <Card className="p-4">
+                  <div className="text-center">
+                    <div className="text-3xl font-bold text-secondary">{selectedStudent.average_score}%</div>
+                    <div className="text-sm text-muted-foreground">Средний балл</div>
+                  </div>
+                </Card>
+                <Card className="p-4">
+                  <div className="text-center">
+                    <div className="text-3xl font-bold text-green-600">{selectedStudent.completed_topics?.length || 0}</div>
+                    <div className="text-sm text-muted-foreground">Тем изучено</div>
+                  </div>
+                </Card>
+              </div>
+
+              {selectedStudent.test_results && selectedStudent.test_results.length > 0 && (
+                <div>
+                  <h4 className="font-bold mb-3">История тестов</h4>
+                  <div className="space-y-2">
+                    {selectedStudent.test_results.slice(0, 5).map((result: any, index: number) => (
+                      <div key={index} className="p-3 bg-muted rounded-lg flex justify-between items-center">
+                        <div>
+                          <p className="font-medium">{result.topic || 'Тест'}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {new Date(result.date).toLocaleDateString('ru-RU')}
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-xl font-bold">{result.score}%</p>
+                          <p className="text-xs text-muted-foreground">
+                            {result.correct_answers}/{result.total_questions}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Send Message Dialog */}
+      <Dialog open={showMessageDialog} onOpenChange={setShowMessageDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Отправить сообщение</DialogTitle>
+            <DialogDescription>
+              {selectedStudent && `Отправить сообщение студенту ${selectedStudent.full_name}`}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <Textarea
+              placeholder="Введите ваше сообщение..."
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              rows={5}
+            />
+            <div className="flex gap-2 justify-end">
+              <Button variant="outline" onClick={() => setShowMessageDialog(false)}>
+                Отмена
+              </Button>
+              <Button onClick={handleSendMessage} disabled={sendingMessage || !message.trim()}>
+                {sendingMessage ? 'Отправка...' : 'Отправить'}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add Student Dialog */}
+      <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Добавить студента</DialogTitle>
+            <DialogDescription>
+              Введите email студента для добавления в вашу группу
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <label className="text-sm font-medium mb-2 block">Email студента</label>
+              <Input
+                type="email"
+                placeholder="student@example.com"
+                value={newStudentEmail}
+                onChange={(e) => setNewStudentEmail(e.target.value)}
+              />
+            </div>
+            <div className="flex gap-2 justify-end">
+              <Button variant="outline" onClick={() => setShowAddDialog(false)}>
+                Отмена
+              </Button>
+              <Button onClick={handleAddStudent} disabled={addingStudent || !newStudentEmail.trim()}>
+                {addingStudent ? 'Добавление...' : 'Добавить'}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
