@@ -1025,7 +1025,7 @@ Q = (ωL)/R = 1/(ωCR)
             </div>
             <div className="flex-1 overflow-y-auto p-6">
               <div className="prose prose-slate max-w-none">
-                {selectedLecture.content.split('\n').map((line, index) => {
+                {selectedLecture.content ? selectedLecture.content.split('\n').map((line, index) => {
                   if (line.startsWith('# ')) {
                     return <h1 key={index} className="text-3xl font-bold mb-4 mt-6">{line.substring(2)}</h1>;
                   } else if (line.startsWith('## ')) {
@@ -1041,7 +1041,12 @@ Q = (ωL)/R = 1/(ωCR)
                   } else {
                     return <p key={index} className="mb-2 text-muted-foreground">{line}</p>;
                   }
-                })}
+                }) : (
+                  <div className="text-center py-8">
+                    <Icon name="FileText" size={48} className="mx-auto mb-4 text-muted-foreground" />
+                    <p className="text-muted-foreground">Содержимое лекции скоро будет добавлено</p>
+                  </div>
+                )}
               </div>
             </div>
             <div className="p-6 border-t bg-muted/30">
