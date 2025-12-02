@@ -181,17 +181,71 @@ const Index = () => {
     {
       subject: 'Электрические цепи переменного тока',
       suggestion: 'Рекомендую уделить внимание реактивным сопротивлениям и резонансным явлениям',
-      priority: 'high'
+      priority: 'high',
+      lectures: [
+        {
+          title: 'Основы переменного тока',
+          duration: '45 мин',
+          description: 'Понятие переменного тока, амплитуда, частота, период',
+          link: '#'
+        },
+        {
+          title: 'Реактивные сопротивления',
+          duration: '50 мин',
+          description: 'Индуктивное и емкостное сопротивления, фазовые сдвиги',
+          link: '#'
+        },
+        {
+          title: 'Резонанс в цепях переменного тока',
+          duration: '40 мин',
+          description: 'Последовательный и параллельный резонанс, практические применения',
+          link: '#'
+        }
+      ]
     },
     {
       subject: 'Конденсаторы',
       suggestion: 'Отлично! Продолжайте практиковать расчеты емкостей при различных соединениях',
-      priority: 'low'
+      priority: 'low',
+      lectures: [
+        {
+          title: 'Устройство и принцип работы конденсаторов',
+          duration: '35 мин',
+          description: 'Строение конденсатора, типы диэлектриков, основные параметры',
+          link: '#'
+        },
+        {
+          title: 'Соединение конденсаторов',
+          duration: '40 мин',
+          description: 'Последовательное и параллельное соединение, расчет емкостей',
+          link: '#'
+        }
+      ]
     },
     {
       subject: 'Электрические цепи постоянного тока',
       suggestion: 'Попробуйте решить задачи на применение законов Кирхгофа',
-      priority: 'medium'
+      priority: 'medium',
+      lectures: [
+        {
+          title: 'Законы Кирхгофа',
+          duration: '55 мин',
+          description: 'Первый и второй законы Кирхгофа, методика решения задач',
+          link: '#'
+        },
+        {
+          title: 'Расчет сложных электрических цепей',
+          duration: '60 мин',
+          description: 'Метод узловых потенциалов, метод контурных токов',
+          link: '#'
+        },
+        {
+          title: 'Мощность и энергия в цепях постоянного тока',
+          duration: '45 мин',
+          description: 'Расчет мощности, КПД, закон Джоуля-Ленца',
+          link: '#'
+        }
+      ]
     }
   ];
 
@@ -392,7 +446,37 @@ const Index = () => {
                             : 'Низко'}
                         </Badge>
                       </div>
-                      <p className="text-sm text-muted-foreground">{rec.suggestion}</p>
+                      <p className="text-sm text-muted-foreground mb-4">{rec.suggestion}</p>
+                      
+                      {rec.lectures && rec.lectures.length > 0 && (
+                        <div className="mt-4 space-y-2">
+                          <div className="flex items-center gap-2 mb-3">
+                            <Icon name="BookOpen" size={16} className="text-primary" />
+                            <span className="text-sm font-semibold">Рекомендуемые лекции:</span>
+                          </div>
+                          {rec.lectures.map((lecture, lectureIndex) => (
+                            <a
+                              key={lectureIndex}
+                              href={lecture.link}
+                              className="block p-3 rounded-lg bg-card border border-border hover:border-primary/50 hover:shadow-md transition-all group"
+                            >
+                              <div className="flex items-start justify-between gap-3">
+                                <div className="flex-1">
+                                  <div className="flex items-center gap-2 mb-1">
+                                    <Icon name="Play" size={14} className="text-primary group-hover:text-secondary transition-colors" />
+                                    <span className="font-medium text-sm group-hover:text-primary transition-colors">{lecture.title}</span>
+                                  </div>
+                                  <p className="text-xs text-muted-foreground">{lecture.description}</p>
+                                </div>
+                                <Badge variant="outline" className="text-xs whitespace-nowrap">
+                                  <Icon name="Clock" size={12} className="mr-1" />
+                                  {lecture.duration}
+                                </Badge>
+                              </div>
+                            </a>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))}
