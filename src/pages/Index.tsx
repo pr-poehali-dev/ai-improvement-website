@@ -11,7 +11,10 @@ const Index = () => {
   const [activeTab, setActiveTab] = useState('home');
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
-  const [score, setScore] = useState(75);
+  const [testStarted, setTestStarted] = useState(false);
+  const [testCompleted, setTestCompleted] = useState(false);
+  const [userAnswers, setUserAnswers] = useState<number[]>([]);
+  const [showResult, setShowResult] = useState(false);
 
   const testQuestions = [
     {
@@ -30,9 +33,19 @@ const Index = () => {
       correct: 0
     },
     {
-      question: 'Столица Франции?',
-      answers: ['Лондон', 'Париж', 'Берлин', 'Мадрид'],
+      question: 'Какой элемент имеет химический символ O?',
+      answers: ['Водород', 'Кислород', 'Азот', 'Углерод'],
       correct: 1
+    },
+    {
+      question: 'Сколько будет 15 × 8?',
+      answers: ['100', '110', '120', '130'],
+      correct: 2
+    },
+    {
+      question: 'Кто написал "Войну и мир"?',
+      answers: ['Достоевский', 'Пушкин', 'Толстой', 'Чехов'],
+      correct: 2
     }
   ];
 
@@ -71,15 +84,52 @@ const Index = () => {
     }
   ];
 
+  const handleStartTest = () => {
+    setTestStarted(true);
+    setTestCompleted(false);
+    setCurrentQuestion(0);
+    setUserAnswers([]);
+    setSelectedAnswer(null);
+    setShowResult(false);
+    setActiveTab('tests');
+  };
+
   const handleAnswerSelect = (index: number) => {
     setSelectedAnswer(index);
   };
 
   const handleNextQuestion = () => {
-    if (currentQuestion < testQuestions.length - 1) {
-      setCurrentQuestion(currentQuestion + 1);
-      setSelectedAnswer(null);
+    if (selectedAnswer !== null) {
+      const newAnswers = [...userAnswers, selectedAnswer];
+      setUserAnswers(newAnswers);
+      
+      if (currentQuestion < testQuestions.length - 1) {
+        setCurrentQuestion(currentQuestion + 1);
+        setSelectedAnswer(null);
+      } else {
+        setTestCompleted(true);
+        setShowResult(true);
+      }
     }
+  };
+
+  const calculateScore = () => {
+    let correct = 0;
+    userAnswers.forEach((answer, index) => {
+      if (answer === testQuestions[index].correct) {
+        correct++;
+      }
+    });
+    return Math.round((correct / testQuestions.length) * 100);
+  };
+
+  const restartTest = () => {
+    setTestStarted(false);
+    setTestCompleted(false);
+    setCurrentQuestion(0);
+    setUserAnswers([]);
+    setSelectedAnswer(null);
+    setShowResult(false);
   };
 
   return (
@@ -134,11 +184,11 @@ const Index = () => {
                     Твой ИИ-помощник готов помочь улучшить успеваемость
                   </p>
                   <div className="flex gap-3 flex-wrap">
-                    <Button size="lg" className="gap-2">
+                    <Button size="lg" className="gap-2" onClick={handleStartTest}>
                       <Icon name="Play" size={20} />
                       Начать тест
                     </Button>
-                    <Button size="lg" variant="outline" className="gap-2">
+                    <Button size="lg" variant="outline" className="gap-2" onClick={() => setActiveTab('analytics')}>
                       <Icon name="BarChart3" size={20} />
                       Мой прогресс
                     </Button>
@@ -238,68 +288,171 @@ const Index = () => {
           </TabsContent>
 
           <TabsContent value="tests" className="animate-fade-in">
-            <Card className="p-8">
-              <div className="mb-8">
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-2xl font-bold">
-                    Вопрос {currentQuestion + 1} из {testQuestions.length}
+            {!testStarted ? (
+              <Card className="p-8 text-center">
+                <div className="max-w-2xl mx-auto">
+                  <div className="w-24 h-24 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <Icon name="ClipboardList" className="text-primary" size={48} />
+                  </div>
+                  <h2 className="text-3xl font-bold mb-4">Готовы начать тест?</h2>
+                  <p className="text-lg text-muted-foreground mb-8">
+                    Тест содержит {testQuestions.length} вопросов. Выберите один правильный ответ для каждого вопроса.
+                  </p>
+                  <div className="grid md:grid-cols-3 gap-4 mb-8">
+                    <div className="p-4 bg-muted/50 rounded-lg">
+                      <Icon name="HelpCircle" className="mx-auto mb-2 text-primary" size={32} />
+                      <div className="font-bold text-2xl">{testQuestions.length}</div>
+                      <div className="text-sm text-muted-foreground">Вопросов</div>
+                    </div>
+                    <div className="p-4 bg-muted/50 rounded-lg">
+                      <Icon name="Clock" className="mx-auto mb-2 text-secondary" size={32} />
+                      <div className="font-bold text-2xl">10</div>
+                      <div className="text-sm text-muted-foreground">Минут</div>
+                    </div>
+                    <div className="p-4 bg-muted/50 rounded-lg">
+                      <Icon name="Target" className="mx-auto mb-2 text-accent" size={32} />
+                      <div className="font-bold text-2xl">100</div>
+                      <div className="text-sm text-muted-foreground">Макс. баллов</div>
+                    </div>
+                  </div>
+                  <Button size="lg" className="gap-2" onClick={handleStartTest}>
+                    <Icon name="Play" size={20} />
+                    Начать тест
+                  </Button>
+                </div>
+              </Card>
+            ) : showResult ? (
+              <Card className="p-8">
+                <div className="max-w-2xl mx-auto text-center">
+                  <div className={`w-32 h-32 rounded-full flex items-center justify-center mx-auto mb-6 ${
+                    calculateScore() >= 80 ? 'bg-secondary/20' : calculateScore() >= 60 ? 'bg-accent/20' : 'bg-destructive/20'
+                  }`}>
+                    <Icon 
+                      name={calculateScore() >= 80 ? 'Trophy' : calculateScore() >= 60 ? 'Award' : 'AlertCircle'} 
+                      className={calculateScore() >= 80 ? 'text-secondary' : calculateScore() >= 60 ? 'text-accent' : 'text-destructive'}
+                      size={64} 
+                    />
+                  </div>
+                  <h2 className="text-3xl font-bold mb-4">
+                    {calculateScore() >= 80 ? 'Отлично!' : calculateScore() >= 60 ? 'Хорошо!' : 'Нужно подтянуть'}
                   </h2>
-                  <Badge variant="outline" className="text-lg px-4 py-2">
-                    <Icon name="Clock" size={16} className="mr-2" />
-                    5:30
-                  </Badge>
-                </div>
-                <Progress value={((currentQuestion + 1) / testQuestions.length) * 100} className="h-2" />
-              </div>
-
-              <div className="mb-8">
-                <h3 className="text-xl font-semibold mb-6">{testQuestions[currentQuestion].question}</h3>
-                <div className="space-y-3">
-                  {testQuestions[currentQuestion].answers.map((answer, index) => (
-                    <button
-                      key={index}
-                      onClick={() => handleAnswerSelect(index)}
-                      className={`w-full p-4 text-left rounded-lg border-2 transition-all ${
-                        selectedAnswer === index
-                          ? 'border-primary bg-primary/10'
-                          : 'border-border hover:border-primary/50 hover:bg-muted/50'
-                      }`}
-                    >
-                      <div className="flex items-center gap-3">
-                        <div
-                          className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
-                            selectedAnswer === index ? 'border-primary bg-primary' : 'border-muted-foreground'
-                          }`}
-                        >
-                          {selectedAnswer === index && <div className="w-3 h-3 rounded-full bg-white"></div>}
+                  <div className="text-6xl font-bold text-primary mb-4">{calculateScore()}%</div>
+                  <p className="text-lg text-muted-foreground mb-8">
+                    Вы правильно ответили на {userAnswers.filter((ans, idx) => ans === testQuestions[idx].correct).length} из {testQuestions.length} вопросов
+                  </p>
+                  
+                  <div className="space-y-4 mb-8 text-left">
+                    <h3 className="text-xl font-bold text-center mb-4">Ваши ответы:</h3>
+                    {testQuestions.map((q, idx) => {
+                      const isCorrect = userAnswers[idx] === q.correct;
+                      return (
+                        <div key={idx} className={`p-4 rounded-lg border-2 ${
+                          isCorrect ? 'border-secondary bg-secondary/5' : 'border-destructive bg-destructive/5'
+                        }`}>
+                          <div className="flex items-start gap-3">
+                            <Icon 
+                              name={isCorrect ? 'CheckCircle2' : 'XCircle'} 
+                              className={isCorrect ? 'text-secondary' : 'text-destructive'}
+                              size={24}
+                            />
+                            <div className="flex-1">
+                              <div className="font-medium mb-2">{q.question}</div>
+                              <div className="text-sm">
+                                <span className="text-muted-foreground">Ваш ответ: </span>
+                                <span className={isCorrect ? 'text-secondary' : 'text-destructive'}>
+                                  {q.answers[userAnswers[idx]]}
+                                </span>
+                                {!isCorrect && (
+                                  <>
+                                    <br />
+                                    <span className="text-muted-foreground">Правильный ответ: </span>
+                                    <span className="text-secondary">{q.answers[q.correct]}</span>
+                                  </>
+                                )}
+                              </div>
+                            </div>
+                          </div>
                         </div>
-                        <span className="font-medium">{answer}</span>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              </div>
+                      );
+                    })}
+                  </div>
 
-              <div className="flex justify-between">
-                <Button variant="outline" disabled={currentQuestion === 0}>
-                  <Icon name="ChevronLeft" size={20} className="mr-2" />
-                  Назад
-                </Button>
-                <Button onClick={handleNextQuestion} disabled={selectedAnswer === null}>
-                  {currentQuestion < testQuestions.length - 1 ? (
-                    <>
-                      Далее
-                      <Icon name="ChevronRight" size={20} className="ml-2" />
-                    </>
-                  ) : (
-                    <>
-                      Завершить
-                      <Icon name="Check" size={20} className="ml-2" />
-                    </>
-                  )}
-                </Button>
-              </div>
-            </Card>
+                  <div className="flex gap-4 justify-center">
+                    <Button size="lg" onClick={restartTest} className="gap-2">
+                      <Icon name="RotateCcw" size={20} />
+                      Пройти снова
+                    </Button>
+                    <Button size="lg" variant="outline" onClick={() => setActiveTab('home')} className="gap-2">
+                      <Icon name="Home" size={20} />
+                      На главную
+                    </Button>
+                  </div>
+                </div>
+              </Card>
+            ) : (
+              <Card className="p-8">
+                <div className="mb-8">
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-2xl font-bold">
+                      Вопрос {currentQuestion + 1} из {testQuestions.length}
+                    </h2>
+                    <Badge variant="outline" className="text-lg px-4 py-2">
+                      <Icon name="Brain" size={16} className="mr-2" />
+                      Тест по предметам
+                    </Badge>
+                  </div>
+                  <Progress value={((currentQuestion + 1) / testQuestions.length) * 100} className="h-2" />
+                </div>
+
+                <div className="mb-8">
+                  <h3 className="text-xl font-semibold mb-6">{testQuestions[currentQuestion].question}</h3>
+                  <div className="space-y-3">
+                    {testQuestions[currentQuestion].answers.map((answer, index) => (
+                      <button
+                        key={index}
+                        onClick={() => handleAnswerSelect(index)}
+                        className={`w-full p-4 text-left rounded-lg border-2 transition-all hover-scale ${
+                          selectedAnswer === index
+                            ? 'border-primary bg-primary/10'
+                            : 'border-border hover:border-primary/50 hover:bg-muted/50'
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div
+                            className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
+                              selectedAnswer === index ? 'border-primary bg-primary' : 'border-muted-foreground'
+                            }`}
+                          >
+                            {selectedAnswer === index && <div className="w-3 h-3 rounded-full bg-white"></div>}
+                          </div>
+                          <span className="font-medium">{answer}</span>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="flex justify-between">
+                  <Button variant="outline" onClick={restartTest}>
+                    <Icon name="X" size={20} className="mr-2" />
+                    Отменить
+                  </Button>
+                  <Button onClick={handleNextQuestion} disabled={selectedAnswer === null}>
+                    {currentQuestion < testQuestions.length - 1 ? (
+                      <>
+                        Далее
+                        <Icon name="ChevronRight" size={20} className="ml-2" />
+                      </>
+                    ) : (
+                      <>
+                        Завершить
+                        <Icon name="Check" size={20} className="ml-2" />
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </Card>
+            )}
           </TabsContent>
 
           <TabsContent value="profile" className="animate-fade-in">
