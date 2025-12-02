@@ -1364,8 +1364,12 @@ P_max = I²R = 2² × 3 = 12 Вт
         <header className="mb-12 animate-fade-in">
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-xl bg-primary flex items-center justify-center">
-                <Icon name="GraduationCap" className="text-white" size={28} />
+              <div className="w-16 h-16 rounded-xl overflow-hidden shadow-lg border-2 border-primary/20">
+                <img 
+                  src="https://cdn.poehali.dev/projects/2340c444-1239-4e7b-b126-c7cce6b9f819/files/3811f2c6-c8dc-442c-a79b-78e4a65708f3.jpg" 
+                  alt="Электровоз ЭП20"
+                  className="w-full h-full object-cover"
+                />
               </div>
               <div>
                 <h1 className="text-3xl font-bold tracking-tight">Магистраль знаний</h1>
