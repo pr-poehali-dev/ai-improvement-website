@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
@@ -8,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
 
 const Index = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('home');
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
@@ -16,6 +18,19 @@ const Index = () => {
   const [userAnswers, setUserAnswers] = useState<number[]>([]);
   const [showResult, setShowResult] = useState(false);
   const [selectedLecture, setSelectedLecture] = useState<{title: string; content: string; duration: string} | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userName, setUserName] = useState('');
+
+  useEffect(() => {
+    const token = localStorage.getItem('auth_token');
+    const userStr = localStorage.getItem('user');
+    
+    if (token && userStr) {
+      setIsAuthenticated(true);
+      const user = JSON.parse(userStr);
+      setUserName(user.full_name);
+    }
+  }, []);
 
   const testQuestions = [
     {
@@ -1376,10 +1391,21 @@ P_max = I²R = 2² × 3 = 12 Вт
                 <p className="text-sm text-muted-foreground">Платформа для успешного обучения</p>
               </div>
             </div>
-            <Button variant="outline" className="gap-2">
-              <Icon name="User" size={18} />
-              Профиль
-            </Button>
+            {isAuthenticated ? (
+              <Button variant="outline" className="gap-2" onClick={() => navigate('/profile')}>
+                <Icon name="User" size={18} />
+                {userName}
+              </Button>
+            ) : (
+              <div className="flex gap-2">
+                <Button variant="outline" onClick={() => navigate('/login')}>
+                  Войти
+                </Button>
+                <Button onClick={() => navigate('/register')}>
+                  Регистрация
+                </Button>
+              </div>
+            )}
           </div>
         </header>
 
