@@ -50,6 +50,7 @@ export default function Register() {
 
       localStorage.setItem('auth_token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
+      localStorage.setItem('user_name', data.user.full_name || fullName);
       navigate('/');
     } catch (err) {
       setError('Ошибка подключения к серверу');

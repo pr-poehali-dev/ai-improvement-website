@@ -1822,12 +1822,38 @@ P_max = I²R = 2² × 3 = 12 Вт
 
           <TabsContent value="profile" className="animate-fade-in">
             <Card className="p-8">
+              {isAuthenticated && (
+                <div className="flex justify-between items-center mb-6 pb-4 border-b">
+                  <h2 className="text-2xl font-bold">Личный профиль</h2>
+                  <div className="flex gap-2">
+                    <Button variant="outline" onClick={() => navigate('/profile')} className="gap-2">
+                      <Icon name="ExternalLink" size={18} />
+                      Подробный профиль
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      onClick={() => {
+                        localStorage.removeItem('auth_token');
+                        localStorage.removeItem('user');
+                        localStorage.removeItem('user_name');
+                        setIsAuthenticated(false);
+                        setUserName('');
+                        setActiveTab('home');
+                      }}
+                      className="gap-2 text-red-600 hover:text-red-700"
+                    >
+                      <Icon name="LogOut" size={18} />
+                      Выйти
+                    </Button>
+                  </div>
+                </div>
+              )}
               <div className="flex flex-col md:flex-row gap-8">
                 <div className="flex flex-col items-center gap-4">
                   <Avatar className="w-32 h-32">
                     <AvatarImage src="" />
                     <AvatarFallback className="text-3xl bg-primary/10 text-primary">
-                      {studentStats.name
+                      {(isAuthenticated ? userName : studentStats.name)
                         .split(' ')
                         .map((n) => n[0])
                         .join('')}
@@ -1841,7 +1867,9 @@ P_max = I²R = 2² × 3 = 12 Вт
 
                 <div className="flex-1 space-y-6">
                   <div>
-                    <h2 className="text-3xl font-bold mb-2">{studentStats.name}</h2>
+                    <h2 className="text-3xl font-bold mb-2">
+                      {isAuthenticated ? userName : studentStats.name}
+                    </h2>
                     <p className="text-muted-foreground text-lg">{studentStats.grade}</p>
                   </div>
 
@@ -1879,11 +1907,15 @@ P_max = I²R = 2² × 3 = 12 Вт
                     <h3 className="font-semibold text-lg mb-4">Статистика</h3>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                       <div className="text-center p-4 rounded-lg bg-muted/50">
-                        <div className="text-2xl font-bold text-primary">{studentStats.testsCompleted}</div>
+                        <div className="text-2xl font-bold text-primary">
+                          {isAuthenticated ? userProgress.testsCompleted : studentStats.testsCompleted}
+                        </div>
                         <div className="text-xs text-muted-foreground mt-1">Тестов</div>
                       </div>
                       <div className="text-center p-4 rounded-lg bg-muted/50">
-                        <div className="text-2xl font-bold text-secondary">{studentStats.averageScore}%</div>
+                        <div className="text-2xl font-bold text-secondary">
+                          {isAuthenticated ? userProgress.averageScore : studentStats.averageScore}%
+                        </div>
                         <div className="text-xs text-muted-foreground mt-1">Средний балл</div>
                       </div>
                       <div className="text-center p-4 rounded-lg bg-muted/50">

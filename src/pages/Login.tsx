@@ -36,6 +36,7 @@ export default function Login() {
 
       localStorage.setItem('auth_token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
+      localStorage.setItem('user_name', data.user.full_name);
       navigate('/');
     } catch (err) {
       setError('Ошибка подключения к серверу');
