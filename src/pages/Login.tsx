@@ -37,7 +37,13 @@ export default function Login() {
       localStorage.setItem('auth_token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
       localStorage.setItem('user_name', data.user.full_name);
-      navigate('/');
+      localStorage.setItem('user_role', data.user.role || 'student');
+      
+      if (data.user.role === 'teacher') {
+        navigate('/teacher');
+      } else {
+        navigate('/');
+      }
     } catch (err) {
       setError('Ошибка подключения к серверу');
     } finally {

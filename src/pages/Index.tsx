@@ -30,6 +30,12 @@ const Index = () => {
   useEffect(() => {
     const token = localStorage.getItem('auth_token');
     const userStr = localStorage.getItem('user');
+    const role = localStorage.getItem('user_role');
+    
+    if (role === 'teacher') {
+      navigate('/teacher');
+      return;
+    }
     
     if (token && userStr) {
       setIsAuthenticated(true);
@@ -38,7 +44,7 @@ const Index = () => {
       setUserName(firstName);
       loadUserProgress(token);
     }
-  }, []);
+  }, [navigate]);
 
   const loadUserProgress = async (token: string) => {
     setLoadingProgress(true);

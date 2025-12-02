@@ -65,6 +65,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 email = body_data.get('email', '').strip().lower()
                 password = body_data.get('password', '')
                 full_name = body_data.get('full_name', '').strip()
+                role = body_data.get('role', 'student')
                 
                 if not email or not password or not full_name:
                     return {
@@ -84,8 +85,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 password_hash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
                 
                 cursor.execute(
-                    "INSERT INTO users (email, password_hash, full_name) VALUES (%s, %s, %s) RETURNING id, email, full_name, created_at",
-                    (email, password_hash, full_name)
+                    "INSERT INTO users (email, password_hash, full_name, role) VALUES (%s, %s, %s, %s) RETURNING id, email, full_name, role, created_at",
+                    (email, password_hash, full_name, role)
                 )
                 user = cursor.fetchone()
                 
@@ -107,6 +108,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                             'id': user['id'],
                             'email': user['email'],
                             'full_name': user['full_name'],
+                            'role': user['role'],
                             'created_at': user['created_at'].isoformat()
                         }
                     })
@@ -124,7 +126,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     }
                 
                 cursor.execute(
-                    "SELECT id, email, password_hash, full_name, created_at FROM users WHERE email = %s",
+                    "SELECT id, email, password_hash, full_name, role, created_at FROM users WHERE email = %s",
                     (email,)
                 )
                 user = cursor.fetchone()
@@ -147,6 +149,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                             'id': user['id'],
                             'email': user['email'],
                             'full_name': user['full_name'],
+                            'role': user['role'],
                             'created_at': user['created_at'].isoformat()
                         }
                     })
@@ -174,7 +177,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             
             cursor.execute(
                 """
-                SELECT u.id, u.email, u.full_name, u.created_at, 
+                SELECT u.id, u.email, u.full_name, u.role, u.created_at, 
                        up.test_results, up.completed_topics, up.last_activity
                 FROM users u
                 LEFT JOIN user_progress up ON u.id = up.user_id
@@ -199,6 +202,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                         'id': user['id'],
                         'email': user['email'],
                         'full_name': user['full_name'],
+                        'role': user['role'],
                         'created_at': user['created_at'].isoformat(),
                         'test_results': user['test_results'] or [],
                         'completed_topics': user['completed_topics'] or [],

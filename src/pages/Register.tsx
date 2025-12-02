@@ -10,6 +10,7 @@ export default function Register() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [role, setRole] = useState<'student' | 'teacher'>('student');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -37,7 +38,8 @@ export default function Register() {
           action: 'register',
           email,
           password,
-          full_name: fullName
+          full_name: fullName,
+          role
         })
       });
 
@@ -51,7 +53,13 @@ export default function Register() {
       localStorage.setItem('auth_token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
       localStorage.setItem('user_name', data.user.full_name || fullName);
-      navigate('/');
+      localStorage.setItem('user_role', role);
+      
+      if (role === 'teacher') {
+        navigate('/teacher');
+      } else {
+        navigate('/');
+      }
     } catch (err) {
       setError('Ошибка подключения к серверу');
     } finally {
@@ -82,6 +90,38 @@ export default function Register() {
                 <span className="text-sm">{error}</span>
               </div>
             )}
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Тип аккаунта</label>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  onClick={() => setRole('student')}
+                  className={`p-4 rounded-lg border-2 transition-all ${
+                    role === 'student'
+                      ? 'border-primary bg-primary/10'
+                      : 'border-border hover:border-primary/50'
+                  }`}
+                  disabled={loading}
+                >
+                  <Icon name="GraduationCap" size={24} className="mx-auto mb-2" />
+                  <div className="text-sm font-medium">Студент</div>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setRole('teacher')}
+                  className={`p-4 rounded-lg border-2 transition-all ${
+                    role === 'teacher'
+                      ? 'border-primary bg-primary/10'
+                      : 'border-border hover:border-primary/50'
+                  }`}
+                  disabled={loading}
+                >
+                  <Icon name="BookOpen" size={24} className="mx-auto mb-2" />
+                  <div className="text-sm font-medium">Преподаватель</div>
+                </button>
+              </div>
+            </div>
 
             <div className="space-y-2">
               <label className="text-sm font-medium">Полное имя</label>
