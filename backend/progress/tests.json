@@ -1,0 +1,21 @@
+{
+  "tests": [
+    {
+      "name": "Save test result",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "action": "save_test_result",
+        "topic": "Тестовая тема",
+        "score": 80,
+        "total_questions": 5,
+        "correct_answers": 4
+      },
+      "expectedStatus": 401,
+      "expectedBody": {
+        "error": "string"
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}

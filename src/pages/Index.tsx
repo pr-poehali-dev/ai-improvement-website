@@ -1339,7 +1339,7 @@ P_max = I²R = 2² × 3 = 12 Вт
     setSelectedAnswer(index);
   };
 
-  const handleNextQuestion = () => {
+  const handleNextQuestion = async () => {
     if (selectedAnswer !== null) {
       const newAnswers = [...userAnswers, selectedAnswer];
       setUserAnswers(newAnswers);
@@ -1350,6 +1350,33 @@ P_max = I²R = 2² × 3 = 12 Вт
       } else {
         setTestCompleted(true);
         setShowResult(true);
+        
+        if (isAuthenticated) {
+          const correct = newAnswers.filter((answer, index) => answer === testQuestions[index].correct).length;
+          const score = Math.round((correct / testQuestions.length) * 100);
+          
+          const token = localStorage.getItem('auth_token');
+          if (token) {
+            try {
+              await fetch('https://functions.poehali.dev/6f04f0e4-6b9b-4b83-9359-a67eb64cd803', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'X-Auth-Token': token
+                },
+                body: JSON.stringify({
+                  action: 'save_test_result',
+                  topic: testQuestions[0].topic,
+                  score: score,
+                  total_questions: testQuestions.length,
+                  correct_answers: correct
+                })
+              });
+            } catch (error) {
+              console.error('Ошибка сохранения результата:', error);
+            }
+          }
+        }
       }
     }
   };
@@ -1434,7 +1461,7 @@ P_max = I²R = 2² × 3 = 12 Вт
               <div className="flex flex-col md:flex-row items-center gap-6">
                 <div className="flex-1">
                   <h2 className="text-3xl font-bold mb-3">
-                    Привет, {studentStats.name.split(' ')[0]}! 👋
+                    Привет, {isAuthenticated ? userName.split(' ')[0] : studentStats.name.split(' ')[0]}! 👋
                   </h2>
                   <p className="text-lg text-muted-foreground mb-6">
                     Твой ИИ-помощник готов помочь улучшить успеваемость

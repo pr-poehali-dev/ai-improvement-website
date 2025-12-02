@@ -32,7 +32,7 @@ export default function Profile() {
     }
 
     try {
-      const response = await fetch('https://functions.poehali.dev/00d219fa-c385-45ba-9f19-93a74748312c', {
+      const response = await fetch('https://functions.poehali.dev/6f04f0e4-6b9b-4b83-9359-a67eb64cd803', {
         method: 'GET',
         headers: {
           'X-Auth-Token': token
@@ -171,17 +171,23 @@ export default function Profile() {
               История тестов
             </h2>
             <div className="space-y-3">
-              {user.test_results.map((result: any, index: number) => (
-                <div key={index} className="p-4 bg-muted rounded-lg flex items-center justify-between">
+              {user.test_results.slice().reverse().map((result: any, index: number) => (
+                <div key={index} className="p-4 bg-muted rounded-lg flex items-center justify-between hover:bg-muted/80 transition-colors">
                   <div>
                     <p className="font-medium">{result.topic || 'Тест'}</p>
                     <p className="text-sm text-muted-foreground">
-                      {new Date(result.date).toLocaleDateString('ru-RU')}
+                      {new Date(result.date).toLocaleDateString('ru-RU', { 
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })}
                     </p>
                   </div>
                   <div className="text-right">
                     <p className="text-2xl font-bold text-primary">{result.score}%</p>
-                    <p className="text-xs text-muted-foreground">Результат</p>
+                    <p className="text-xs text-muted-foreground">{result.correct_answers}/{result.total_questions} правильных</p>
                   </div>
                 </div>
               ))}
