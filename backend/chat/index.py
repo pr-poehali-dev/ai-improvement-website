@@ -36,15 +36,11 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             'isBase64Encoded': False
         }
     
-    dsn = os.environ['DATABASE_URL']
-    if '?' in dsn:
-        dsn = dsn.split('?')[0]
-    dsn += '?options=-c search_path=t_p91447108_ai_improvement_websi,public'
-    
-    conn = psycopg2.connect(dsn)
+    conn = psycopg2.connect(os.environ['DATABASE_URL'])
     cursor = conn.cursor()
     
     try:
+        cursor.execute("SET search_path = t_p91447108_ai_improvement_websi, public")
         cursor.execute("SELECT id, role FROM users WHERE auth_token = %s", (auth_token,))
         user_row = cursor.fetchone()
         
