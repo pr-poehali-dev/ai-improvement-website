@@ -141,6 +141,37 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 }
         
         elif method == 'GET':
+            query_params = event.get('queryStringParameters') or {}
+            action = query_params.get('action')
+            
+            if action == 'get_teachers':
+                cursor.execute(
+                    """
+                    SELECT u.id, u.full_name, u.email
+                    FROM users u
+                    INNER JOIN teacher_students ts ON ts.teacher_id = u.id
+                    WHERE ts.student_id = %s AND u.role = 'teacher'
+                    ORDER BY u.full_name
+                    """,
+                    (user_id,)
+                )
+                teachers = cursor.fetchall()
+                
+                return {
+                    'statusCode': 200,
+                    'headers': headers,
+                    'body': json.dumps({
+                        'teachers': [
+                            {
+                                'id': t['id'],
+                                'full_name': t['full_name'],
+                                'email': t['email']
+                            }
+                            for t in teachers
+                        ]
+                    })
+                }
+            
             cursor.execute(
                 """
                 SELECT u.id, u.email, u.full_name, u.created_at,

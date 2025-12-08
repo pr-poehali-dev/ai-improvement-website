@@ -135,9 +135,11 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                            up.test_results, up.last_activity
                     FROM users u
                     LEFT JOIN user_progress up ON u.id = up.user_id
-                    WHERE u.role = 'student'
+                    INNER JOIN teacher_students ts ON ts.student_id = u.id
+                    WHERE u.role = 'student' AND ts.teacher_id = %s
                     ORDER BY u.created_at DESC
-                    """
+                    """,
+                    (teacher_id,)
                 )
                 students = cursor.fetchall()
                 

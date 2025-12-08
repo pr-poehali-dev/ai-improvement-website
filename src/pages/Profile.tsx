@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 import Icon from '@/components/ui/icon';
+import ChatDialog from '@/components/ChatDialog';
 
 interface UserData {
   id: number;
@@ -13,14 +15,31 @@ interface UserData {
   last_activity: string | null;
 }
 
+interface Teacher {
+  id: number;
+  full_name: string;
+  email: string;
+}
+
 export default function Profile() {
   const navigate = useNavigate();
   const [user, setUser] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [teachers, setTeachers] = useState<Teacher[]>([]);
+  const [showChatDialog, setShowChatDialog] = useState(false);
+  const [chatTeacherId, setChatTeacherId] = useState<number>(0);
+  const [chatTeacherName, setChatTeacherName] = useState('');
+  const [currentUserId, setCurrentUserId] = useState<number>(0);
 
   useEffect(() => {
     loadProfile();
+    loadTeachers();
+    
+    const userId = localStorage.getItem('user_id');
+    if (userId) {
+      setCurrentUserId(parseInt(userId));
+    }
   }, []);
 
   const loadProfile = async () => {
@@ -56,6 +75,28 @@ export default function Profile() {
       setError('Ошибка подключения к серверу');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadTeachers = async () => {
+    const token = localStorage.getItem('auth_token');
+    if (!token) return;
+
+    try {
+      const response = await fetch('https://functions.poehali.dev/6f04f0e4-6b9b-4b83-9359-a67eb64cd803?action=get_teachers', {
+        method: 'GET',
+        headers: {
+          'X-Auth-Token': token
+        }
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setTeachers(data.teachers || []);
+      }
+    } catch (err) {
+      console.error('Ошибка загрузки преподавателей:', err);
     }
   };
 
@@ -164,6 +205,43 @@ export default function Profile() {
           </div>
         </div>
 
+        {teachers.length > 0 && (
+          <Card className="p-6 mb-6">
+            <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+              <Icon name="Users" size={24} />
+              Мои преподаватели
+            </h2>
+            <div className="space-y-3">
+              {teachers.map(teacher => (
+                <div key={teacher.id} className="p-4 bg-muted rounded-lg flex items-center justify-between hover:bg-muted/80 transition-colors">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white font-bold">
+                      {teacher.full_name.split(' ').map(n => n[0]).join('')}
+                    </div>
+                    <div>
+                      <p className="font-medium">{teacher.full_name}</p>
+                      <p className="text-sm text-muted-foreground">{teacher.email}</p>
+                    </div>
+                  </div>
+                  <Button 
+                    size="sm" 
+                    variant="outline" 
+                    className="gap-2"
+                    onClick={() => {
+                      setChatTeacherId(teacher.id);
+                      setChatTeacherName(teacher.full_name);
+                      setShowChatDialog(true);
+                    }}
+                  >
+                    <Icon name="MessageCircle" size={16} />
+                    Написать
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </Card>
+        )}
+
         {user.test_results && user.test_results.length > 0 && (
           <div className="bg-white rounded-2xl shadow-xl p-8 border border-border">
             <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
@@ -194,6 +272,14 @@ export default function Profile() {
             </div>
           </div>
         )}
+
+        <ChatDialog
+          open={showChatDialog}
+          onOpenChange={setShowChatDialog}
+          otherUserId={chatTeacherId}
+          otherUserName={chatTeacherName}
+          currentUserId={currentUserId}
+        />
       </div>
     </div>
   );
