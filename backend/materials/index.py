@@ -98,7 +98,41 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             body_data = json.loads(event.get('body', '{}'))
             action = body_data.get('action')
             
-            if action == 'upload':
+            if action == 'create':
+                title = body_data.get('title', '').strip()
+                description = body_data.get('description', '').strip()
+                content = body_data.get('content', '').strip()
+                category = body_data.get('category', 'Общее')
+                
+                if not title or not content:
+                    return {
+                        'statusCode': 400,
+                        'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                        'body': json.dumps({'error': 'Title and content are required'}),
+                        'isBase64Encoded': False
+                    }
+                
+                cursor.execute("""
+                    INSERT INTO t_p91447108_ai_improvement_websi.learning_materials 
+                    (teacher_id, title, description, file_url, file_type, file_size, category)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s)
+                    RETURNING id
+                """, (user_id, title, description, content, 'text/plain', len(content), category))
+                
+                material_id = cursor.fetchone()[0]
+                conn.commit()
+                
+                return {
+                    'statusCode': 200,
+                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                    'body': json.dumps({
+                        'success': True,
+                        'material_id': material_id
+                    }),
+                    'isBase64Encoded': False
+                }
+            
+            elif action == 'upload':
                 title = body_data.get('title', '').strip()
                 description = body_data.get('description', '').strip()
                 file_base64 = body_data.get('file_base64')

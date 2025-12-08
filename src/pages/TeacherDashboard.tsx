@@ -53,10 +53,12 @@ export default function TeacherDashboard() {
   const [materialTitle, setMaterialTitle] = useState('');
   const [materialDescription, setMaterialDescription] = useState('');
   const [materialCategory, setMaterialCategory] = useState('Общее');
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [materialContent, setMaterialContent] = useState('');
   
   const [showReviewDialog, setShowReviewDialog] = useState(false);
   const [selectedMaterialForReview, setSelectedMaterialForReview] = useState<Material | null>(null);
+  const [showViewDialog, setShowViewDialog] = useState(false);
+  const [selectedMaterialForView, setSelectedMaterialForView] = useState<Material | null>(null);
   const [materialStatuses, setMaterialStatuses] = useState<any[]>([]);
   const [reviewStatus, setReviewStatus] = useState('completed');
   const [reviewComment, setReviewComment] = useState('');
@@ -195,15 +197,9 @@ export default function TeacherDashboard() {
     }
   };
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setSelectedFile(e.target.files[0]);
-    }
-  };
-
   const handleUploadMaterial = async () => {
-    if (!materialTitle.trim() || !selectedFile) {
-      alert('Заполните название и выберите файл');
+    if (!materialTitle.trim() || !materialContent.trim()) {
+      alert('Заполните название и содержание материала');
       return;
     }
 
@@ -211,44 +207,36 @@ export default function TeacherDashboard() {
     const token = localStorage.getItem('auth_token');
 
     try {
-      const reader = new FileReader();
-      reader.onload = async () => {
-        const base64 = (reader.result as string).split(',')[1];
+      const response = await fetch('https://functions.poehali.dev/370b1dc6-d070-4917-b166-1422d71566fb', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Auth-Token': token!
+        },
+        body: JSON.stringify({
+          action: 'create',
+          title: materialTitle,
+          description: materialDescription,
+          content: materialContent,
+          category: materialCategory
+        })
+      });
 
-        const response = await fetch('https://functions.poehali.dev/370b1dc6-d070-4917-b166-1422d71566fb', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-Auth-Token': token!
-          },
-          body: JSON.stringify({
-            action: 'upload',
-            title: materialTitle,
-            description: materialDescription,
-            file_base64: base64,
-            file_name: selectedFile.name,
-            file_type: selectedFile.type,
-            category: materialCategory
-          })
-        });
-
-        if (response.ok) {
-          setMaterialTitle('');
-          setMaterialDescription('');
-          setMaterialCategory('Общее');
-          setSelectedFile(null);
-          setShowUploadDialog(false);
-          loadMaterials();
-          alert('Материал успешно загружен!');
-        } else {
-          const errorData = await response.json();
-          alert('Не удалось загрузить материал: ' + (errorData.error || 'Неизвестная ошибка'));
-        }
-      };
-      reader.readAsDataURL(selectedFile);
+      if (response.ok) {
+        setMaterialTitle('');
+        setMaterialDescription('');
+        setMaterialCategory('Общее');
+        setMaterialContent('');
+        setShowUploadDialog(false);
+        loadMaterials();
+        alert('Материал успешно создан!');
+      } else {
+        const errorData = await response.json();
+        alert('Не удалось создать материал: ' + (errorData.error || 'Неизвестная ошибка'));
+      }
     } catch (error) {
-      console.error('Ошибка загрузки материала:', error);
-      alert('Не удалось загрузить материал');
+      console.error('Ошибка создания материала:', error);
+      alert('Не удалось создать материал');
     } finally {
       setUploadingFile(false);
     }
@@ -283,14 +271,12 @@ export default function TeacherDashboard() {
     return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
   };
 
-  const getFileIcon = (fileType: string) => {
-    if (fileType.includes('pdf')) return 'FileText';
-    if (fileType.includes('image')) return 'Image';
-    if (fileType.includes('video')) return 'Video';
-    if (fileType.includes('word') || fileType.includes('document')) return 'FileText';
-    if (fileType.includes('excel') || fileType.includes('spreadsheet')) return 'Table';
-    if (fileType.includes('powerpoint') || fileType.includes('presentation')) return 'Presentation';
-    return 'File';
+  const getMaterialIcon = (category: string) => {
+    if (category === 'Лекции') return 'BookOpen';
+    if (category === 'Практика') return 'Code';
+    if (category === 'Тесты') return 'ClipboardCheck';
+    if (category === 'Домашние задания') return 'Home';
+    return 'FileText';
   };
 
   const loadMaterialStatuses = async (materialId: number) => {
@@ -774,7 +760,7 @@ export default function TeacherDashboard() {
                     <Card key={material.id} className="p-5 hover:shadow-lg transition-shadow">
                       <div className="flex items-start gap-4">
                         <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                          <Icon name={getFileIcon(material.file_type)} size={24} className="text-primary" />
+                          <Icon name={getMaterialIcon(material.category)} size={24} className="text-primary" />
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-start justify-between gap-2 mb-1">
@@ -789,20 +775,19 @@ export default function TeacherDashboard() {
                               <Icon name="Calendar" size={12} />
                               {new Date(material.created_at).toLocaleDateString('ru-RU')}
                             </span>
-                            <span className="flex items-center gap-1">
-                              <Icon name="HardDrive" size={12} />
-                              {formatFileSize(material.file_size)}
-                            </span>
                           </div>
                           <div className="flex gap-2">
                             <Button 
                               size="sm" 
                               variant="outline" 
                               className="gap-2 flex-1"
-                              onClick={() => window.open(material.file_url, '_blank')}
+                              onClick={() => {
+                                setSelectedMaterialForView(material);
+                                setShowViewDialog(true);
+                              }}
                             >
-                              <Icon name="Download" size={14} />
-                              Скачать
+                              <Icon name="Eye" size={14} />
+                              Просмотр
                             </Button>
                             <Button 
                               size="sm" 
@@ -931,11 +916,11 @@ export default function TeacherDashboard() {
 
       {/* Upload Material Dialog */}
       <Dialog open={showUploadDialog} onOpenChange={setShowUploadDialog}>
-        <DialogContent>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Загрузить учебный материал</DialogTitle>
+            <DialogTitle>Создать учебный материал</DialogTitle>
             <DialogDescription>
-              Загрузите файл с учебным материалом для ваших студентов
+              Создайте текстовый материал для ваших студентов
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
@@ -945,15 +930,6 @@ export default function TeacherDashboard() {
                 placeholder="Например: Лекция 5 - Алгоритмы"
                 value={materialTitle}
                 onChange={(e) => setMaterialTitle(e.target.value)}
-              />
-            </div>
-            <div>
-              <label className="text-sm font-medium mb-2 block">Описание</label>
-              <Textarea
-                placeholder="Краткое описание материала..."
-                value={materialDescription}
-                onChange={(e) => setMaterialDescription(e.target.value)}
-                rows={3}
               />
             </div>
             <div>
@@ -972,31 +948,41 @@ export default function TeacherDashboard() {
               </select>
             </div>
             <div>
-              <label className="text-sm font-medium mb-2 block">Файл *</label>
-              <Input
-                type="file"
-                onChange={handleFileSelect}
+              <label className="text-sm font-medium mb-2 block">Краткое описание</label>
+              <Textarea
+                placeholder="Краткое описание материала..."
+                value={materialDescription}
+                onChange={(e) => setMaterialDescription(e.target.value)}
+                rows={2}
               />
-              {selectedFile && (
-                <p className="text-sm text-muted-foreground mt-2">
-                  Выбран: {selectedFile.name} ({formatFileSize(selectedFile.size)})
-                </p>
-              )}
+            </div>
+            <div>
+              <label className="text-sm font-medium mb-2 block">Содержание материала *</label>
+              <Textarea
+                placeholder="Введите текст лекции, задания или другой учебный материал..."
+                value={materialContent}
+                onChange={(e) => setMaterialContent(e.target.value)}
+                rows={15}
+                className="font-mono"
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                {materialContent.length} символов
+              </p>
             </div>
             <div className="flex gap-2 justify-end">
               <Button variant="outline" onClick={() => {
                 setShowUploadDialog(false);
                 setMaterialTitle('');
                 setMaterialDescription('');
-                setSelectedFile(null);
+                setMaterialContent('');
               }}>
                 Отмена
               </Button>
               <Button 
                 onClick={handleUploadMaterial} 
-                disabled={uploadingFile || !materialTitle.trim() || !selectedFile}
+                disabled={uploadingFile || !materialTitle.trim() || !materialContent.trim()}
               >
-                {uploadingFile ? 'Загрузка...' : 'Загрузить'}
+                {uploadingFile ? 'Создание...' : 'Создать'}
               </Button>
             </div>
           </div>
@@ -1110,6 +1096,32 @@ export default function TeacherDashboard() {
               </div>
             </div>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* View Material Dialog */}
+      <Dialog open={showViewDialog} onOpenChange={setShowViewDialog}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{selectedMaterialForView?.title}</DialogTitle>
+            <DialogDescription>
+              {selectedMaterialForView?.category} • {selectedMaterialForView?.created_at && new Date(selectedMaterialForView.created_at).toLocaleDateString('ru-RU')}
+            </DialogDescription>
+          </DialogHeader>
+          {selectedMaterialForView && (
+            <div className="space-y-4">
+              {selectedMaterialForView.description && (
+                <div className="p-4 bg-muted rounded-lg">
+                  <p className="text-sm text-muted-foreground">{selectedMaterialForView.description}</p>
+                </div>
+              )}
+              <div className="prose prose-sm max-w-none">
+                <div className="p-6 bg-white rounded-lg border whitespace-pre-wrap">
+                  {selectedMaterialForView.file_url}
+                </div>
+              </div>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
 
