@@ -206,6 +206,90 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     })
                 }
             
+            elif action == 'update_material_status':
+                material_id = body_data.get('material_id')
+                student_id = body_data.get('student_id')
+                status = body_data.get('status')
+                teacher_comment = body_data.get('teacher_comment', '')
+                
+                if not material_id or not student_id or not status:
+                    cursor.close()
+                    conn.close()
+                    return {
+                        'statusCode': 400,
+                        'headers': headers,
+                        'body': json.dumps({'error': 'material_id, student_id и status обязательны'})
+                    }
+                
+                cursor.execute(
+                    """
+                    INSERT INTO material_status
+                    (material_id, student_id, status, teacher_comment, reviewed_at, updated_at)
+                    VALUES (%s, %s, %s, %s, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+                    ON CONFLICT (material_id, student_id)
+                    DO UPDATE SET 
+                        status = EXCLUDED.status,
+                        teacher_comment = EXCLUDED.teacher_comment,
+                        reviewed_at = CURRENT_TIMESTAMP,
+                        updated_at = CURRENT_TIMESTAMP
+                    """,
+                    (material_id, student_id, status, teacher_comment)
+                )
+                conn.commit()
+                
+                cursor.close()
+                conn.close()
+                
+                return {
+                    'statusCode': 200,
+                    'headers': headers,
+                    'body': json.dumps({'success': True})
+                }
+            
+            elif action == 'get_material_statuses':
+                material_id = body_data.get('material_id')
+                
+                if not material_id:
+                    cursor.close()
+                    conn.close()
+                    return {
+                        'statusCode': 400,
+                        'headers': headers,
+                        'body': json.dumps({'error': 'material_id обязателен'})
+                    }
+                
+                cursor.execute(
+                    """
+                    SELECT ms.student_id, u.full_name, u.email, ms.status, 
+                           ms.teacher_comment, ms.updated_at
+                    FROM material_status ms
+                    JOIN users u ON u.id = ms.student_id
+                    WHERE ms.material_id = %s
+                    ORDER BY ms.updated_at DESC
+                    """,
+                    (material_id,)
+                )
+                
+                statuses = []
+                for row in cursor.fetchall():
+                    statuses.append({
+                        'student_id': row['student_id'],
+                        'student_name': row['full_name'],
+                        'student_email': row['email'],
+                        'status': row['status'],
+                        'teacher_comment': row['teacher_comment'],
+                        'updated_at': row['updated_at'].isoformat() if row['updated_at'] else None
+                    })
+                
+                cursor.close()
+                conn.close()
+                
+                return {
+                    'statusCode': 200,
+                    'headers': headers,
+                    'body': json.dumps({'statuses': statuses})
+                }
+            
             elif action == 'add_student':
                 email = body_data.get('email', '').strip().lower()
                 

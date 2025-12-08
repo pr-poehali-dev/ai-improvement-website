@@ -54,6 +54,7 @@ export default function Register() {
       localStorage.setItem('user', JSON.stringify(data.user));
       localStorage.setItem('user_name', data.user.full_name || fullName);
       localStorage.setItem('user_role', role);
+      localStorage.setItem('user_id', data.user.id.toString());
       
       if (role === 'teacher') {
         navigate('/teacher');

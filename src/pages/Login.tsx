@@ -38,6 +38,7 @@ export default function Login() {
       localStorage.setItem('user', JSON.stringify(data.user));
       localStorage.setItem('user_name', data.user.full_name);
       localStorage.setItem('user_role', data.user.role || 'student');
+      localStorage.setItem('user_id', data.user.id.toString());
       
       if (data.user.role === 'teacher') {
         navigate('/teacher');

@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import Icon from '@/components/ui/icon';
+import ChatDialog from '@/components/ChatDialog';
 
 interface Student {
   id: number;
@@ -53,6 +54,18 @@ export default function TeacherDashboard() {
   const [materialDescription, setMaterialDescription] = useState('');
   const [materialCategory, setMaterialCategory] = useState('Общее');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  
+  const [showReviewDialog, setShowReviewDialog] = useState(false);
+  const [selectedMaterialForReview, setSelectedMaterialForReview] = useState<Material | null>(null);
+  const [materialStatuses, setMaterialStatuses] = useState<any[]>([]);
+  const [reviewStatus, setReviewStatus] = useState('completed');
+  const [reviewComment, setReviewComment] = useState('');
+  const [selectedStudentForReview, setSelectedStudentForReview] = useState<number | null>(null);
+  
+  const [showChatDialog, setShowChatDialog] = useState(false);
+  const [chatStudentId, setChatStudentId] = useState<number>(0);
+  const [chatStudentName, setChatStudentName] = useState('');
+  const [currentUserId, setCurrentUserId] = useState<number>(0);
 
   useEffect(() => {
     const role = localStorage.getItem('user_role');
@@ -64,6 +77,11 @@ export default function TeacherDashboard() {
     const userName = localStorage.getItem('user_name');
     if (userName) {
       setTeacherName(userName);
+    }
+    
+    const userId = localStorage.getItem('user_id');
+    if (userId) {
+      setCurrentUserId(parseInt(userId));
     }
 
     loadStudents();
@@ -272,6 +290,71 @@ export default function TeacherDashboard() {
     if (fileType.includes('excel') || fileType.includes('spreadsheet')) return 'Table';
     if (fileType.includes('powerpoint') || fileType.includes('presentation')) return 'Presentation';
     return 'File';
+  };
+
+  const loadMaterialStatuses = async (materialId: number) => {
+    const token = localStorage.getItem('auth_token');
+    if (!token) return;
+
+    try {
+      const response = await fetch('https://functions.poehali.dev/e6287ede-7b3e-49b4-9586-8da518c65740', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Auth-Token': token
+        },
+        body: JSON.stringify({
+          action: 'get_material_statuses',
+          material_id: materialId
+        })
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        setMaterialStatuses(data.statuses || []);
+      }
+    } catch (error) {
+      console.error('Ошибка загрузки статусов:', error);
+    }
+  };
+
+  const handleOpenReview = async (material: Material) => {
+    setSelectedMaterialForReview(material);
+    await loadMaterialStatuses(material.id);
+    setShowReviewDialog(true);
+  };
+
+  const handleUpdateMaterialStatus = async () => {
+    if (!selectedStudentForReview || !selectedMaterialForReview) return;
+
+    const token = localStorage.getItem('auth_token');
+
+    try {
+      const response = await fetch('https://functions.poehali.dev/e6287ede-7b3e-49b4-9586-8da518c65740', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Auth-Token': token!
+        },
+        body: JSON.stringify({
+          action: 'update_material_status',
+          material_id: selectedMaterialForReview.id,
+          student_id: selectedStudentForReview,
+          status: reviewStatus,
+          teacher_comment: reviewComment
+        })
+      });
+
+      if (response.ok) {
+        await loadMaterialStatuses(selectedMaterialForReview.id);
+        setReviewComment('');
+        setSelectedStudentForReview(null);
+        alert('Статус обновлен!');
+      }
+    } catch (error) {
+      console.error('Ошибка обновления статуса:', error);
+      alert('Не удалось обновить статус');
+    }
   };
 
   const handleAddStudent = async () => {
@@ -548,12 +631,13 @@ export default function TeacherDashboard() {
                               variant="outline" 
                               className="gap-2"
                               onClick={() => {
-                                setSelectedStudent(student);
-                                setShowMessageDialog(true);
+                                setChatStudentId(student.id);
+                                setChatStudentName(student.full_name);
+                                setShowChatDialog(true);
                               }}
                             >
                               <Icon name="MessageCircle" size={16} />
-                              Написать
+                              Чат
                             </Button>
                           </div>
                         </div>
@@ -718,6 +802,15 @@ export default function TeacherDashboard() {
                             >
                               <Icon name="Download" size={14} />
                               Скачать
+                            </Button>
+                            <Button 
+                              size="sm" 
+                              variant="outline" 
+                              className="gap-2"
+                              onClick={() => handleOpenReview(material)}
+                            >
+                              <Icon name="CheckSquare" size={14} />
+                              Проверка
                             </Button>
                             <Button 
                               size="sm" 
@@ -909,6 +1002,116 @@ export default function TeacherDashboard() {
         </DialogContent>
       </Dialog>
 
+      {/* Material Review Dialog */}
+      <Dialog open={showReviewDialog} onOpenChange={setShowReviewDialog}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Проверка изучения материала</DialogTitle>
+            <DialogDescription>
+              {selectedMaterialForReview && selectedMaterialForReview.title}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-6">
+            <div className="grid md:grid-cols-2 gap-6">
+              <div>
+                <h3 className="font-bold mb-3">Студенты</h3>
+                <div className="space-y-2 max-h-96 overflow-y-auto">
+                  {students.map(student => {
+                    const status = materialStatuses.find(s => s.student_id === student.id);
+                    return (
+                      <div 
+                        key={student.id}
+                        className={`p-3 rounded-lg border cursor-pointer transition-colors ${
+                          selectedStudentForReview === student.id
+                            ? 'border-primary bg-primary/5'
+                            : 'border-muted hover:border-primary/50'
+                        }`}
+                        onClick={() => {
+                          setSelectedStudentForReview(student.id);
+                          if (status) {
+                            setReviewStatus(status.status);
+                            setReviewComment(status.teacher_comment || '');
+                          } else {
+                            setReviewStatus('not_started');
+                            setReviewComment('');
+                          }
+                        }}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="font-medium">{student.full_name}</p>
+                            <p className="text-xs text-muted-foreground">{student.email}</p>
+                          </div>
+                          {status && (
+                            <Badge className={
+                              status.status === 'completed' ? 'bg-green-100 text-green-700' :
+                              status.status === 'needs_review' ? 'bg-yellow-100 text-yellow-700' :
+                              status.status === 'in_progress' ? 'bg-blue-100 text-blue-700' :
+                              'bg-gray-100 text-gray-700'
+                            }>
+                              {status.status === 'completed' && 'Изучено'}
+                              {status.status === 'needs_review' && 'Требует изучения'}
+                              {status.status === 'in_progress' && 'В процессе'}
+                              {status.status === 'not_started' && 'Не начато'}
+                            </Badge>
+                          )}
+                        </div>
+                        {status && status.teacher_comment && (
+                          <p className="text-sm text-muted-foreground mt-2">
+                            {status.teacher_comment}
+                          </p>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div>
+                <h3 className="font-bold mb-3">Отметка о проверке</h3>
+                {selectedStudentForReview ? (
+                  <div className="space-y-4">
+                    <div>
+                      <label className="text-sm font-medium mb-2 block">Статус изучения</label>
+                      <select
+                        className="w-full px-3 py-2 border rounded-md"
+                        value={reviewStatus}
+                        onChange={(e) => setReviewStatus(e.target.value)}
+                      >
+                        <option value="not_started">Не начато</option>
+                        <option value="in_progress">В процессе</option>
+                        <option value="completed">Лекция изучена</option>
+                        <option value="needs_review">Лекция требует изучения</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium mb-2 block">Комментарий преподавателя</label>
+                      <Textarea
+                        placeholder="Добавьте комментарий для студента..."
+                        value={reviewComment}
+                        onChange={(e) => setReviewComment(e.target.value)}
+                        rows={5}
+                      />
+                    </div>
+                    <Button 
+                      className="w-full" 
+                      onClick={handleUpdateMaterialStatus}
+                    >
+                      Сохранить оценку
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="text-center py-12 text-muted-foreground">
+                    <Icon name="UserCheck" size={48} className="mx-auto mb-4 opacity-50" />
+                    <p>Выберите студента для проверки</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {/* Add Student Dialog */}
       <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
         <DialogContent>
@@ -939,6 +1142,15 @@ export default function TeacherDashboard() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Chat Dialog */}
+      <ChatDialog
+        open={showChatDialog}
+        onOpenChange={setShowChatDialog}
+        otherUserId={chatStudentId}
+        otherUserName={chatStudentName}
+        currentUserId={currentUserId}
+      />
     </div>
   );
 }

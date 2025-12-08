@@ -1,0 +1,13 @@
+{
+  "tests": [
+    {
+      "name": "Get messages - unauthorized",
+      "method": "GET",
+      "path": "/",
+      "expectedStatus": 401,
+      "expectedBody": {
+        "error": "Auth token required"
+      }
+    }
+  ]
+}
