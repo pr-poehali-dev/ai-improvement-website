@@ -44,8 +44,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     cursor = conn.cursor()
     
     try:
-        cursor.execute("SET search_path = t_p91447108_ai_improvement_websi, public")
-        cursor.execute("SELECT id, role FROM users WHERE auth_token = %s", (auth_token,))
+        cursor.execute("SELECT id, role FROM t_p91447108_ai_improvement_websi.users WHERE auth_token = %s", (auth_token,))
         user_row = cursor.fetchone()
         
         if not user_row:
@@ -70,7 +69,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             cursor.execute("""
                 SELECT id, title, description, file_url, file_type, file_size, 
                        category, created_at
-                FROM learning_materials 
+                FROM t_p91447108_ai_improvement_websi.learning_materials 
                 WHERE teacher_id = %s 
                 ORDER BY created_at DESC
             """, (user_id,))
@@ -137,7 +136,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 file_url = f"https://cdn.poehali.dev/projects/{os.environ['AWS_ACCESS_KEY_ID']}/bucket/{unique_filename}"
                 
                 cursor.execute("""
-                    INSERT INTO learning_materials 
+                    INSERT INTO t_p91447108_ai_improvement_websi.learning_materials 
                     (teacher_id, title, description, file_url, file_type, file_size, category)
                     VALUES (%s, %s, %s, %s, %s, %s, %s)
                     RETURNING id
@@ -178,7 +177,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 }
             
             cursor.execute(
-                "DELETE FROM learning_materials WHERE id = %s AND teacher_id = %s",
+                "DELETE FROM t_p91447108_ai_improvement_websi.learning_materials WHERE id = %s AND teacher_id = %s",
                 (material_id, user_id)
             )
             conn.commit()

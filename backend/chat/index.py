@@ -40,8 +40,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     cursor = conn.cursor()
     
     try:
-        cursor.execute("SET search_path = t_p91447108_ai_improvement_websi, public")
-        cursor.execute("SELECT id, role FROM users WHERE auth_token = %s", (auth_token,))
+        cursor.execute("SELECT id, role FROM t_p91447108_ai_improvement_websi.users WHERE auth_token = %s", (auth_token,))
         user_row = cursor.fetchone()
         
         if not user_row:
@@ -69,8 +68,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             cursor.execute("""
                 SELECT cm.id, cm.sender_id, cm.receiver_id, cm.message, cm.is_read, cm.created_at,
                        u.full_name
-                FROM chat_messages cm
-                JOIN users u ON u.id = cm.sender_id
+                FROM t_p91447108_ai_improvement_websi.chat_messages cm
+                JOIN t_p91447108_ai_improvement_websi.users u ON u.id = cm.sender_id
                 WHERE (cm.sender_id = %s AND cm.receiver_id = %s)
                    OR (cm.sender_id = %s AND cm.receiver_id = %s)
                 ORDER BY cm.created_at ASC
@@ -89,7 +88,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 })
             
             cursor.execute("""
-                UPDATE chat_messages
+                UPDATE t_p91447108_ai_improvement_websi.chat_messages
                 SET is_read = TRUE
                 WHERE receiver_id = %s AND sender_id = %s AND is_read = FALSE
             """, (user_id, other_user_id))
@@ -119,7 +118,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     }
                 
                 cursor.execute("""
-                    INSERT INTO chat_messages
+                    INSERT INTO t_p91447108_ai_improvement_websi.chat_messages
                     (sender_id, receiver_id, message)
                     VALUES (%s, %s, %s)
                     RETURNING id
@@ -138,7 +137,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             elif action == 'unread_count':
                 cursor.execute("""
                     SELECT COUNT(*)
-                    FROM chat_messages
+                    FROM t_p91447108_ai_improvement_websi.chat_messages
                     WHERE receiver_id = %s AND is_read = FALSE
                 """, (user_id,))
                 

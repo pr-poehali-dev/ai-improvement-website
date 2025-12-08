@@ -241,7 +241,8 @@ export default function TeacherDashboard() {
           loadMaterials();
           alert('Материал успешно загружен!');
         } else {
-          alert('Не удалось загрузить материал');
+          const errorData = await response.json();
+          alert('Не удалось загрузить материал: ' + (errorData.error || 'Неизвестная ошибка'));
         }
       };
       reader.readAsDataURL(selectedFile);
