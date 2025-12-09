@@ -112,7 +112,10 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 """, (user_id,))
             
             materials = []
-            for row in cursor.fetchall():
+            rows = cursor.fetchall()
+            print(f"Found {len(rows)} materials for user_id={user_id}, role={user_role}")
+            
+            for row in rows:
                 material = {
                     'id': row['id'],
                     'title': row['title'],
@@ -127,6 +130,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 if user_role == 'student':
                     material['teacher_name'] = row['teacher_name']
                 materials.append(material)
+            
+            print(f"Returning {len(materials)} materials")
             
             return {
                 'statusCode': 200,
