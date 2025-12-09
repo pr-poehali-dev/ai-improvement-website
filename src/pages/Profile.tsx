@@ -9,6 +9,7 @@ interface UserData {
   id: number;
   email: string;
   full_name: string;
+  class_name?: string;
   created_at: string;
   test_results: any[];
   completed_topics: string[];
@@ -153,6 +154,12 @@ export default function Profile() {
             </div>
             <div className="flex-1">
               <h1 className="text-3xl font-bold mb-2">{user.full_name}</h1>
+              {user.class_name && (
+                <p className="text-lg text-muted-foreground mb-2 flex items-center gap-2">
+                  <Icon name="GraduationCap" size={16} />
+                  Класс: {user.class_name}
+                </p>
+              )}
               <p className="text-muted-foreground flex items-center gap-2 mb-1">
                 <Icon name="Mail" size={16} />
                 {user.email}

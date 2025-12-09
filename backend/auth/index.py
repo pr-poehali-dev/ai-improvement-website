@@ -178,7 +178,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             
             cursor.execute(
                 """
-                SELECT u.id, u.email, u.full_name, u.role, u.created_at, 
+                SELECT u.id, u.email, u.full_name, u.class_name, u.role, u.created_at, 
                        up.test_results, up.completed_topics, up.last_activity
                 FROM users u
                 LEFT JOIN user_progress up ON u.id = up.user_id
@@ -203,6 +203,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                         'id': user['id'],
                         'email': user['email'],
                         'full_name': user['full_name'],
+                        'class_name': user['class_name'],
                         'role': user['role'],
                         'created_at': user['created_at'].isoformat(),
                         'test_results': user['test_results'] or [],
