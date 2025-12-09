@@ -231,8 +231,14 @@ export default function TeacherDashboard() {
         loadMaterials();
         alert('Материал успешно создан!');
       } else {
-        const errorData = await response.json();
-        alert('Не удалось создать материал: ' + (errorData.error || 'Неизвестная ошибка'));
+        const errorText = await response.text();
+        console.error('Ошибка сервера:', errorText);
+        try {
+          const errorData = JSON.parse(errorText);
+          alert('Не удалось создать материал: ' + (errorData.error || errorText));
+        } catch {
+          alert('Не удалось создать материал: ' + errorText);
+        }
       }
     } catch (error) {
       console.error('Ошибка создания материала:', error);

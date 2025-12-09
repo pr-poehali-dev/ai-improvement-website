@@ -163,10 +163,10 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 
                 cursor.execute("""
                     INSERT INTO learning_materials 
-                    (teacher_id, title, description, content, file_type, file_size, category)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s)
+                    (teacher_id, title, description, content, file_url, file_type, file_size, category)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
                     RETURNING id
-                """, (user_id, title, description, content, 'text/plain', len(content), category))
+                """, (user_id, title, description, content, '', 'text/plain', len(content), category))
                 
                 material_id = cursor.fetchone()['id']
                 conn.commit()
