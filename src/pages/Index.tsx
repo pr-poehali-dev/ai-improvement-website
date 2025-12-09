@@ -1857,10 +1857,7 @@ P_max = I²R = 2² × 3 = 12 Вт
                   <Avatar className="w-32 h-32">
                     <AvatarImage src="" />
                     <AvatarFallback className="text-3xl bg-primary/10 text-primary">
-                      {(isAuthenticated ? userName : studentStats.name)
-                        .split(' ')
-                        .map((n) => n[0])
-                        .join('')}
+                      {isAuthenticated && userName ? userName.charAt(0).toUpperCase() : 'У'}
                     </AvatarFallback>
                   </Avatar>
                   <Button variant="outline" className="gap-2">
