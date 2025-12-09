@@ -6,6 +6,7 @@ import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import Icon from '@/components/ui/icon';
 
 const Index = () => {
@@ -28,6 +29,8 @@ const Index = () => {
   const [loadingProgress, setLoadingProgress] = useState(false);
   const [materials, setMaterials] = useState<any[]>([]);
   const [loadingMaterials, setLoadingMaterials] = useState(false);
+  const [selectedMaterial, setSelectedMaterial] = useState<any>(null);
+  const [showMaterialDialog, setShowMaterialDialog] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem('auth_token');
@@ -1710,7 +1713,11 @@ P_max = I²R = 2² × 3 = 12 Вт
                   {materials.map((material) => (
                     <div
                       key={material.id}
-                      className="p-6 rounded-lg border border-border hover:border-primary/50 hover:shadow-md transition-all bg-gradient-to-r from-card to-primary/5"
+                      className="p-6 rounded-lg border border-border hover:border-primary/50 hover:shadow-md transition-all bg-gradient-to-r from-card to-primary/5 cursor-pointer"
+                      onClick={() => {
+                        setSelectedMaterial(material);
+                        setShowMaterialDialog(true);
+                      }}
                     >
                       <div className="flex items-start gap-4">
                         <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-primary/20 to-secondary/10 flex items-center justify-center flex-shrink-0">
@@ -1729,25 +1736,9 @@ P_max = I²R = 2² × 3 = 12 Вт
                             <Badge variant="outline">{material.category}</Badge>
                           </div>
                           {material.description && (
-                            <p className="text-muted-foreground mb-4">{material.description}</p>
+                            <p className="text-muted-foreground mb-2 line-clamp-2">{material.description}</p>
                           )}
-                          {material.content && (
-                            <div className="p-4 bg-muted/50 rounded-lg mb-4">
-                              <pre className="whitespace-pre-wrap font-sans text-sm">{material.content}</pre>
-                            </div>
-                          )}
-                          {material.file_url && !material.content && (
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="gap-2"
-                              onClick={() => window.open(material.file_url, '_blank')}
-                            >
-                              <Icon name="Download" size={16} />
-                              Скачать файл
-                            </Button>
-                          )}
-                          <p className="text-xs text-muted-foreground mt-4">
+                          <p className="text-xs text-muted-foreground mt-2">
                             Добавлено: {new Date(material.created_at).toLocaleDateString('ru-RU', {
                               day: 'numeric',
                               month: 'long',
@@ -1755,6 +1746,7 @@ P_max = I²R = 2² × 3 = 12 Вт
                             })}
                           </p>
                         </div>
+                        <Icon name="ChevronRight" size={20} className="text-muted-foreground" />
                       </div>
                     </div>
                   ))}
@@ -2191,6 +2183,73 @@ P_max = I²R = 2² × 3 = 12 Вт
           </Card>
         </div>
       )}
+
+      <Dialog open={showMaterialDialog} onOpenChange={setShowMaterialDialog}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-3 text-2xl">
+              <Icon name="BookOpen" className="text-primary" size={28} />
+              {selectedMaterial?.title}
+            </DialogTitle>
+            <DialogDescription className="flex items-center gap-4 mt-2">
+              {selectedMaterial?.teacher_name && (
+                <span className="text-sm">
+                  Преподаватель: {selectedMaterial.teacher_name}
+                </span>
+              )}
+              {selectedMaterial?.category && (
+                <Badge variant="outline">{selectedMaterial.category}</Badge>
+              )}
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="mt-6 space-y-6">
+            {selectedMaterial?.description && (
+              <div>
+                <h3 className="font-semibold text-lg mb-2">Описание</h3>
+                <p className="text-muted-foreground">{selectedMaterial.description}</p>
+              </div>
+            )}
+
+            {selectedMaterial?.content && (
+              <div>
+                <h3 className="font-semibold text-lg mb-3">Материал</h3>
+                <div className="p-6 bg-muted/50 rounded-lg border border-border">
+                  <pre className="whitespace-pre-wrap font-sans text-sm leading-relaxed">
+                    {selectedMaterial.content}
+                  </pre>
+                </div>
+              </div>
+            )}
+
+            {selectedMaterial?.file_url && selectedMaterial.file_url !== '' && (
+              <div>
+                <h3 className="font-semibold text-lg mb-3">Файл</h3>
+                <Button
+                  variant="outline"
+                  className="gap-2"
+                  onClick={() => window.open(selectedMaterial.file_url, '_blank')}
+                >
+                  <Icon name="Download" size={18} />
+                  Скачать файл
+                </Button>
+              </div>
+            )}
+
+            <div className="pt-4 border-t">
+              <p className="text-sm text-muted-foreground">
+                Добавлено: {selectedMaterial?.created_at && new Date(selectedMaterial.created_at).toLocaleDateString('ru-RU', {
+                  day: 'numeric',
+                  month: 'long',
+                  year: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit'
+                })}
+              </p>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
