@@ -10,6 +10,7 @@ export default function Register() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [className, setClassName] = useState('');
   const [role, setRole] = useState<'student' | 'teacher'>('student');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -39,6 +40,7 @@ export default function Register() {
           email,
           password,
           full_name: fullName,
+          class_name: className,
           role
         })
       });
@@ -135,6 +137,20 @@ export default function Register() {
                 disabled={loading}
               />
             </div>
+
+            {role === 'student' && (
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Класс</label>
+                <Input
+                  type="text"
+                  value={className}
+                  onChange={(e) => setClassName(e.target.value)}
+                  placeholder="10А"
+                  required
+                  disabled={loading}
+                />
+              </div>
+            )}
 
             <div className="space-y-2">
               <label className="text-sm font-medium">Email</label>

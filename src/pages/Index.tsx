@@ -225,8 +225,6 @@ const Index = () => {
   ];
 
   const studentStats = {
-    name: 'Анна Иванова',
-    grade: '10 класс',
     testsCompleted: 24,
     averageScore: 85,
     strongSubjects: ['Электрические цепи постоянного тока', 'Конденсаторы'],
@@ -1509,7 +1507,7 @@ P_max = I²R = 2² × 3 = 12 Вт
               <div className="flex flex-col md:flex-row items-center gap-6">
                 <div className="flex-1">
                   <h2 className="text-3xl font-bold mb-3">
-                    Привет, {isAuthenticated ? userName : studentStats.name.split(' ')[0]}! 👋
+                    Привет! 👋
                   </h2>
                   <p className="text-lg text-muted-foreground mb-6">
                     Твой ИИ-помощник готов помочь улучшить успеваемость
@@ -1874,9 +1872,9 @@ P_max = I²R = 2² × 3 = 12 Вт
                 <div className="flex-1 space-y-6">
                   <div>
                     <h2 className="text-3xl font-bold mb-2">
-                      {isAuthenticated ? userName : studentStats.name}
+                      Мой профиль
                     </h2>
-                    <p className="text-muted-foreground text-lg">{studentStats.grade}</p>
+                    <p className="text-muted-foreground text-lg">Учебная платформа</p>
                   </div>
 
                   <div className="grid md:grid-cols-2 gap-6">

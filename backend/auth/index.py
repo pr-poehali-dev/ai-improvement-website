@@ -65,6 +65,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 email = body_data.get('email', '').strip().lower()
                 password = body_data.get('password', '')
                 full_name = body_data.get('full_name', '').strip()
+                class_name = body_data.get('class_name', '').strip()
                 role = body_data.get('role', 'student')
                 
                 if not email or not password or not full_name:
@@ -85,8 +86,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 password_hash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
                 
                 cursor.execute(
-                    "INSERT INTO users (email, password_hash, full_name, role) VALUES (%s, %s, %s, %s) RETURNING id, email, full_name, role, created_at",
-                    (email, password_hash, full_name, role)
+                    "INSERT INTO users (email, password_hash, full_name, class_name, role) VALUES (%s, %s, %s, %s, %s) RETURNING id, email, full_name, role, created_at",
+                    (email, password_hash, full_name, class_name, role)
                 )
                 user = cursor.fetchone()
                 
