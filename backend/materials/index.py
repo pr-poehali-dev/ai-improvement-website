@@ -24,7 +24,11 @@ def verify_token(token: str) -> Optional[Dict[str, Any]]:
         return None
 
 def get_db_connection():
-    return psycopg2.connect(DATABASE_URL, cursor_factory=RealDictCursor)
+    conn = psycopg2.connect(DATABASE_URL, cursor_factory=RealDictCursor)
+    cursor = conn.cursor()
+    cursor.execute("SET search_path TO t_p91447108_ai_improvement_websi, public")
+    cursor.close()
+    return conn
 
 def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     method: str = event.get('httpMethod', 'GET')
