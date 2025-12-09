@@ -2,6 +2,8 @@ import { useState, useEffect, useRef } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
 
 interface Message {
@@ -116,79 +118,211 @@ export default function ChatDialog({
     }
   };
 
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(n => n[0])
+      .join('')
+      .toUpperCase()
+      .substring(0, 2);
+  };
+
+  const formatMessageDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const today = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+
+    if (date.toDateString() === today.toDateString()) {
+      return 'Сегодня';
+    } else if (date.toDateString() === yesterday.toDateString()) {
+      return 'Вчера';
+    } else {
+      return date.toLocaleDateString('ru-RU', {
+        day: 'numeric',
+        month: 'long'
+      });
+    }
+  };
+
+  const groupMessagesByDate = (messages: Message[]) => {
+    const groups: { [key: string]: Message[] } = {};
+    
+    messages.forEach(msg => {
+      const dateKey = formatMessageDate(msg.created_at);
+      if (!groups[dateKey]) {
+        groups[dateKey] = [];
+      }
+      groups[dateKey].push(msg);
+    });
+    
+    return groups;
+  };
+
+  const messageGroups = groupMessagesByDate(messages);
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[80vh] flex flex-col">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Icon name="MessageCircle" size={24} />
-            Чат с {otherUserName}
+      <DialogContent className="max-w-3xl h-[85vh] flex flex-col p-0">
+        <DialogHeader className="px-6 py-4 border-b bg-gradient-to-r from-primary/5 to-secondary/5">
+          <DialogTitle className="flex items-center gap-3">
+            <Avatar className="w-10 h-10 border-2 border-primary/20">
+              <AvatarFallback className="bg-gradient-to-br from-primary to-secondary text-white font-semibold">
+                {getInitials(otherUserName)}
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex-1">
+              <div className="font-semibold text-lg">{otherUserName}</div>
+              <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                Онлайн
+              </div>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onOpenChange(false)}
+              className="rounded-full"
+            >
+              <Icon name="X" size={18} />
+            </Button>
           </DialogTitle>
         </DialogHeader>
 
-        <div className="flex-1 overflow-y-auto space-y-3 p-4 bg-muted/30 rounded-lg min-h-[400px]">
+        <div className="flex-1 overflow-y-auto p-6 bg-gradient-to-b from-muted/20 to-background">
           {loading ? (
             <div className="flex items-center justify-center h-full">
-              <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+              <div className="flex flex-col items-center gap-3">
+                <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+                <p className="text-sm text-muted-foreground">Загрузка сообщений...</p>
+              </div>
             </div>
           ) : messages.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-muted-foreground">
-              <Icon name="MessageSquare" size={48} className="mb-4 opacity-50" />
-              <p>Сообщений пока нет</p>
-              <p className="text-sm">Начните разговор!</p>
+              <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+                <Icon name="MessageSquare" size={40} className="text-primary" />
+              </div>
+              <p className="text-lg font-medium">Сообщений пока нет</p>
+              <p className="text-sm">Отправьте первое сообщение</p>
             </div>
           ) : (
-            messages.map((msg) => {
-              const isMe = msg.sender_id === currentUserId;
-              return (
-                <div
-                  key={msg.id}
-                  className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}
-                >
-                  <div
-                    className={`max-w-[70%] rounded-lg p-3 ${
-                      isMe
-                        ? 'bg-primary text-primary-foreground'
-                        : 'bg-background border'
-                    }`}
-                  >
-                    {!isMe && (
-                      <p className="text-xs font-semibold mb-1">{msg.sender_name}</p>
-                    )}
-                    <p className="text-sm whitespace-pre-wrap break-words">{msg.message}</p>
-                    <p
-                      className={`text-xs mt-1 ${
-                        isMe ? 'text-primary-foreground/70' : 'text-muted-foreground'
-                      }`}
-                    >
-                      {new Date(msg.created_at).toLocaleTimeString('ru-RU', {
-                        hour: '2-digit',
-                        minute: '2-digit'
-                      })}
-                    </p>
+            <div className="space-y-6">
+              {Object.entries(messageGroups).map(([date, msgs]) => (
+                <div key={date}>
+                  <div className="flex items-center justify-center mb-4">
+                    <Badge variant="secondary" className="text-xs px-3 py-1">
+                      {date}
+                    </Badge>
+                  </div>
+                  <div className="space-y-3">
+                    {msgs.map((msg, index) => {
+                      const isMe = msg.sender_id === currentUserId;
+                      const showAvatar = index === 0 || msgs[index - 1].sender_id !== msg.sender_id;
+                      
+                      return (
+                        <div
+                          key={msg.id}
+                          className={`flex gap-2 ${isMe ? 'justify-end' : 'justify-start'} animate-fade-in`}
+                        >
+                          {!isMe && (
+                            <Avatar className="w-8 h-8 mt-auto" style={{ visibility: showAvatar ? 'visible' : 'hidden' }}>
+                              <AvatarFallback className="bg-gradient-to-br from-primary/20 to-secondary/20 text-xs">
+                                {getInitials(msg.sender_name)}
+                              </AvatarFallback>
+                            </Avatar>
+                          )}
+                          
+                          <div className={`flex flex-col ${isMe ? 'items-end' : 'items-start'} max-w-[75%]`}>
+                            {!isMe && showAvatar && (
+                              <span className="text-xs font-medium text-muted-foreground mb-1 px-2">
+                                {msg.sender_name}
+                              </span>
+                            )}
+                            
+                            <div
+                              className={`rounded-2xl px-4 py-2.5 shadow-sm ${
+                                isMe
+                                  ? 'bg-gradient-to-r from-primary to-primary/90 text-primary-foreground rounded-br-sm'
+                                  : 'bg-card border border-border rounded-bl-sm'
+                              }`}
+                            >
+                              <p className="text-sm leading-relaxed whitespace-pre-wrap break-words">
+                                {msg.message}
+                              </p>
+                              
+                              <div className={`flex items-center gap-1.5 mt-1.5 ${isMe ? 'justify-end' : 'justify-start'}`}>
+                                <span
+                                  className={`text-xs ${
+                                    isMe ? 'text-primary-foreground/70' : 'text-muted-foreground'
+                                  }`}
+                                >
+                                  {new Date(msg.created_at).toLocaleTimeString('ru-RU', {
+                                    hour: '2-digit',
+                                    minute: '2-digit'
+                                  })}
+                                </span>
+                                {isMe && (
+                                  <Icon 
+                                    name={msg.is_read ? "CheckCheck" : "Check"} 
+                                    size={14} 
+                                    className={msg.is_read ? "text-green-400" : "text-primary-foreground/70"}
+                                  />
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                          
+                          {isMe && (
+                            <Avatar className="w-8 h-8 mt-auto" style={{ visibility: showAvatar ? 'visible' : 'hidden' }}>
+                              <AvatarFallback className="bg-gradient-to-br from-primary to-secondary text-white text-xs font-semibold">
+                                Я
+                              </AvatarFallback>
+                            </Avatar>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
-              );
-            })
+              ))}
+              <div ref={messagesEndRef} />
+            </div>
           )}
-          <div ref={messagesEndRef} />
         </div>
 
-        <div className="flex gap-2">
-          <Input
-            placeholder="Введите сообщение..."
-            value={newMessage}
-            onChange={(e) => setNewMessage(e.target.value)}
-            onKeyPress={handleKeyPress}
-            disabled={sending}
-          />
-          <Button onClick={handleSendMessage} disabled={sending || !newMessage.trim()}>
-            {sending ? (
-              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-            ) : (
-              <Icon name="Send" size={18} />
-            )}
-          </Button>
+        <div className="p-4 border-t bg-background">
+          <div className="flex gap-2">
+            <div className="flex-1 relative">
+              <Input
+                placeholder="Введите сообщение..."
+                value={newMessage}
+                onChange={(e) => setNewMessage(e.target.value)}
+                onKeyPress={handleKeyPress}
+                disabled={sending}
+                className="pr-10 h-11 rounded-full border-2 focus:border-primary"
+              />
+              <Button
+                variant="ghost"
+                size="sm"
+                className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full w-8 h-8 p-0"
+                disabled
+              >
+                <Icon name="Smile" size={18} className="text-muted-foreground" />
+              </Button>
+            </div>
+            <Button 
+              onClick={handleSendMessage} 
+              disabled={sending || !newMessage.trim()}
+              className="rounded-full w-11 h-11 p-0"
+              size="icon"
+            >
+              {sending ? (
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <Icon name="Send" size={18} />
+              )}
+            </Button>
+          </div>
         </div>
       </DialogContent>
     </Dialog>
