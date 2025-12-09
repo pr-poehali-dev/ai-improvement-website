@@ -26,6 +26,8 @@ const Index = () => {
     testResults: []
   });
   const [loadingProgress, setLoadingProgress] = useState(false);
+  const [materials, setMaterials] = useState<any[]>([]);
+  const [loadingMaterials, setLoadingMaterials] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem('auth_token');
@@ -43,6 +45,7 @@ const Index = () => {
       const firstName = user.full_name.trim().split(' ')[0];
       setUserName(firstName);
       loadUserProgress(token);
+      loadMaterials(token);
     }
   }, [navigate]);
 
@@ -75,6 +78,28 @@ const Index = () => {
       console.error('Ошибка загрузки прогресса:', error);
     } finally {
       setLoadingProgress(false);
+    }
+  };
+
+  const loadMaterials = async (token: string) => {
+    setLoadingMaterials(true);
+    try {
+      const response = await fetch('https://functions.poehali.dev/370b1dc6-d070-4917-b166-1422d71566fb', {
+        method: 'GET',
+        headers: {
+          'X-Auth-Token': token
+        }
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setMaterials(data.materials || []);
+      }
+    } catch (error) {
+      console.error('Ошибка загрузки материалов:', error);
+    } finally {
+      setLoadingMaterials(false);
     }
   };
 
@@ -1483,10 +1508,14 @@ P_max = I²R = 2² × 3 = 12 Вт
         </header>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-4 mb-8 h-auto p-1">
+          <TabsList className="grid w-full grid-cols-5 mb-8 h-auto p-1">
             <TabsTrigger value="home" className="gap-2 py-3">
               <Icon name="Home" size={18} />
               <span className="hidden sm:inline">Главная</span>
+            </TabsTrigger>
+            <TabsTrigger value="materials" className="gap-2 py-3">
+              <Icon name="BookOpen" size={18} />
+              <span className="hidden sm:inline">Материалы</span>
             </TabsTrigger>
             <TabsTrigger value="tests" className="gap-2 py-3">
               <Icon name="ClipboardList" size={18} />
@@ -1653,6 +1682,84 @@ P_max = I²R = 2² × 3 = 12 Вт
                   </div>
                 ))}
               </div>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="materials" className="space-y-6 animate-fade-in">
+            <Card className="p-8">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold flex items-center gap-3">
+                  <Icon name="BookOpen" className="text-primary" size={28} />
+                  Учебные материалы
+                </h2>
+              </div>
+
+              {loadingMaterials ? (
+                <div className="text-center py-12">
+                  <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                  <p className="text-muted-foreground">Загрузка материалов...</p>
+                </div>
+              ) : materials.length === 0 ? (
+                <div className="text-center py-12">
+                  <Icon name="FileX" size={48} className="text-muted-foreground mx-auto mb-4" />
+                  <p className="text-lg text-muted-foreground">Материалы пока не загружены</p>
+                  <p className="text-sm text-muted-foreground mt-2">Ваши преподаватели смогут добавить материалы для изучения</p>
+                </div>
+              ) : (
+                <div className="grid gap-4">
+                  {materials.map((material) => (
+                    <div
+                      key={material.id}
+                      className="p-6 rounded-lg border border-border hover:border-primary/50 hover:shadow-md transition-all bg-gradient-to-r from-card to-primary/5"
+                    >
+                      <div className="flex items-start gap-4">
+                        <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-primary/20 to-secondary/10 flex items-center justify-center flex-shrink-0">
+                          <Icon name="FileText" className="text-primary" size={24} />
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-start justify-between gap-4 mb-2">
+                            <div>
+                              <h3 className="font-bold text-lg mb-1">{material.title}</h3>
+                              {material.teacher_name && (
+                                <p className="text-sm text-muted-foreground mb-2">
+                                  Преподаватель: {material.teacher_name}
+                                </p>
+                              )}
+                            </div>
+                            <Badge variant="outline">{material.category}</Badge>
+                          </div>
+                          {material.description && (
+                            <p className="text-muted-foreground mb-4">{material.description}</p>
+                          )}
+                          {material.content && (
+                            <div className="p-4 bg-muted/50 rounded-lg mb-4">
+                              <pre className="whitespace-pre-wrap font-sans text-sm">{material.content}</pre>
+                            </div>
+                          )}
+                          {material.file_url && !material.content && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="gap-2"
+                              onClick={() => window.open(material.file_url, '_blank')}
+                            >
+                              <Icon name="Download" size={16} />
+                              Скачать файл
+                            </Button>
+                          )}
+                          <p className="text-xs text-muted-foreground mt-4">
+                            Добавлено: {new Date(material.created_at).toLocaleDateString('ru-RU', {
+                              day: 'numeric',
+                              month: 'long',
+                              year: 'numeric'
+                            })}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </Card>
           </TabsContent>
 

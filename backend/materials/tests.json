@@ -6,7 +6,7 @@
       "path": "/",
       "expectedStatus": 401,
       "expectedBody": {
-        "error": "Auth token required"
+        "error": "Токен авторизации не предоставлен"
       }
     }
   ]

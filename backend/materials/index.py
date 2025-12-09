@@ -1,19 +1,32 @@
+"""
+Business: Material management for teachers - upload, list, and share materials with students
+Args: event with httpMethod, body, headers; context with request_id
+Returns: HTTP response with materials data
+"""
+
 import json
 import os
 import base64
 import uuid
-from typing import Dict, Any
+import jwt
+from typing import Dict, Any, Optional
 import psycopg2
+from psycopg2.extras import RealDictCursor
 import boto3
-from datetime import datetime
+
+DATABASE_URL = os.environ.get('DATABASE_URL')
+JWT_SECRET = os.environ.get('JWT_SECRET', 'default-secret-change-in-production')
+
+def verify_token(token: str) -> Optional[Dict[str, Any]]:
+    try:
+        return jwt.decode(token, JWT_SECRET, algorithms=['HS256'])
+    except:
+        return None
+
+def get_db_connection():
+    return psycopg2.connect(DATABASE_URL, cursor_factory=RealDictCursor)
 
 def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
-    '''
-    Бизнес: Управление учебными материалами (загрузка, список, удаление)
-    Args: event - dict с httpMethod, body, queryStringParameters, headers
-          context - объект с атрибутами: request_id, function_name
-    Returns: HTTP response dict
-    '''
     method: str = event.get('httpMethod', 'GET')
     
     if method == 'OPTIONS':
@@ -29,72 +42,104 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             'isBase64Encoded': False
         }
     
-    headers = event.get('headers', {})
-    auth_token = headers.get('X-Auth-Token') or headers.get('x-auth-token')
+    headers_dict = event.get('headers', {})
+    auth_token = headers_dict.get('X-Auth-Token') or headers_dict.get('x-auth-token')
+    
+    response_headers = {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
+    }
     
     if not auth_token:
         return {
             'statusCode': 401,
-            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-            'body': json.dumps({'error': 'Auth token required'}),
+            'headers': response_headers,
+            'body': json.dumps({'error': 'Токен авторизации не предоставлен'}),
             'isBase64Encoded': False
         }
     
-    conn = psycopg2.connect(os.environ['DATABASE_URL'])
-    cursor = conn.cursor()
+    payload = verify_token(auth_token)
+    if not payload:
+        return {
+            'statusCode': 401,
+            'headers': response_headers,
+            'body': json.dumps({'error': 'Недействительный токен'}),
+            'isBase64Encoded': False
+        }
+    
+    user_id = payload.get('user_id')
     
     try:
-        cursor.execute("SELECT id, role FROM t_p91447108_ai_improvement_websi.users WHERE auth_token = %s", (auth_token,))
-        user_row = cursor.fetchone()
+        conn = get_db_connection()
+        cursor = conn.cursor()
         
-        if not user_row:
+        cursor.execute("SELECT role FROM users WHERE id = %s", (user_id,))
+        user = cursor.fetchone()
+        
+        if not user:
             return {
-                'statusCode': 401,
-                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                'body': json.dumps({'error': 'Invalid token'}),
+                'statusCode': 404,
+                'headers': response_headers,
+                'body': json.dumps({'error': 'Пользователь не найден'}),
                 'isBase64Encoded': False
             }
         
-        user_id, role = user_row
-        
-        if role != 'teacher':
-            return {
-                'statusCode': 403,
-                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                'body': json.dumps({'error': 'Only teachers can manage materials'}),
-                'isBase64Encoded': False
-            }
+        user_role = user['role']
         
         if method == 'GET':
-            cursor.execute("""
-                SELECT id, title, description, file_url, file_type, file_size, 
-                       category, created_at
-                FROM t_p91447108_ai_improvement_websi.learning_materials 
-                WHERE teacher_id = %s 
-                ORDER BY created_at DESC
-            """, (user_id,))
+            if user_role == 'teacher':
+                cursor.execute("""
+                    SELECT id, title, description, content, file_url, file_type, 
+                           file_size, category, created_at
+                    FROM learning_materials 
+                    WHERE teacher_id = %s 
+                    ORDER BY created_at DESC
+                """, (user_id,))
+            else:
+                cursor.execute("""
+                    SELECT lm.id, lm.title, lm.description, lm.content, lm.file_url, 
+                           lm.file_type, lm.file_size, lm.category, lm.created_at,
+                           u.full_name as teacher_name
+                    FROM learning_materials lm
+                    JOIN teacher_students ts ON lm.teacher_id = ts.teacher_id
+                    JOIN users u ON lm.teacher_id = u.id
+                    WHERE ts.student_id = %s
+                    ORDER BY lm.created_at DESC
+                """, (user_id,))
             
             materials = []
             for row in cursor.fetchall():
-                materials.append({
-                    'id': row[0],
-                    'title': row[1],
-                    'description': row[2],
-                    'file_url': row[3],
-                    'file_type': row[4],
-                    'file_size': row[5],
-                    'category': row[6],
-                    'created_at': row[7].isoformat() if row[7] else None
-                })
+                material = {
+                    'id': row['id'],
+                    'title': row['title'],
+                    'description': row['description'],
+                    'content': row.get('content'),
+                    'file_url': row['file_url'],
+                    'file_type': row['file_type'],
+                    'file_size': row['file_size'],
+                    'category': row['category'],
+                    'created_at': row['created_at'].isoformat() if row['created_at'] else None
+                }
+                if user_role == 'student':
+                    material['teacher_name'] = row['teacher_name']
+                materials.append(material)
             
             return {
                 'statusCode': 200,
-                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'headers': response_headers,
                 'body': json.dumps({'materials': materials}),
                 'isBase64Encoded': False
             }
         
         elif method == 'POST':
+            if user_role != 'teacher':
+                return {
+                    'statusCode': 403,
+                    'headers': response_headers,
+                    'body': json.dumps({'error': 'Только преподаватели могут загружать материалы'}),
+                    'isBase64Encoded': False
+                }
+            
             body_data = json.loads(event.get('body', '{}'))
             action = body_data.get('action')
             
@@ -107,24 +152,24 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 if not title or not content:
                     return {
                         'statusCode': 400,
-                        'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                        'body': json.dumps({'error': 'Title and content are required'}),
+                        'headers': response_headers,
+                        'body': json.dumps({'error': 'Название и содержание обязательны'}),
                         'isBase64Encoded': False
                     }
                 
                 cursor.execute("""
-                    INSERT INTO t_p91447108_ai_improvement_websi.learning_materials 
-                    (teacher_id, title, description, file_url, file_type, file_size, category)
+                    INSERT INTO learning_materials 
+                    (teacher_id, title, description, content, file_type, file_size, category)
                     VALUES (%s, %s, %s, %s, %s, %s, %s)
                     RETURNING id
                 """, (user_id, title, description, content, 'text/plain', len(content), category))
                 
-                material_id = cursor.fetchone()[0]
+                material_id = cursor.fetchone()['id']
                 conn.commit()
                 
                 return {
                     'statusCode': 200,
-                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                    'headers': response_headers,
                     'body': json.dumps({
                         'success': True,
                         'material_id': material_id
@@ -143,8 +188,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 if not title or not file_base64 or not file_name:
                     return {
                         'statusCode': 400,
-                        'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                        'body': json.dumps({'error': 'Title, file and file_name are required'}),
+                        'headers': response_headers,
+                        'body': json.dumps({'error': 'Название, файл и имя файла обязательны'}),
                         'isBase64Encoded': False
                     }
                 
@@ -170,18 +215,18 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 file_url = f"https://cdn.poehali.dev/projects/{os.environ['AWS_ACCESS_KEY_ID']}/bucket/{unique_filename}"
                 
                 cursor.execute("""
-                    INSERT INTO t_p91447108_ai_improvement_websi.learning_materials 
+                    INSERT INTO learning_materials 
                     (teacher_id, title, description, file_url, file_type, file_size, category)
                     VALUES (%s, %s, %s, %s, %s, %s, %s)
                     RETURNING id
                 """, (user_id, title, description, file_url, file_type, file_size, category))
                 
-                material_id = cursor.fetchone()[0]
+                material_id = cursor.fetchone()['id']
                 conn.commit()
                 
                 return {
                     'statusCode': 200,
-                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                    'headers': response_headers,
                     'body': json.dumps({
                         'success': True,
                         'material_id': material_id,
@@ -193,44 +238,59 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             else:
                 return {
                     'statusCode': 400,
-                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                    'body': json.dumps({'error': 'Invalid action'}),
+                    'headers': response_headers,
+                    'body': json.dumps({'error': 'Неверное действие'}),
                     'isBase64Encoded': False
                 }
         
         elif method == 'DELETE':
+            if user_role != 'teacher':
+                return {
+                    'statusCode': 403,
+                    'headers': response_headers,
+                    'body': json.dumps({'error': 'Только преподаватели могут удалять материалы'}),
+                    'isBase64Encoded': False
+                }
+            
             params = event.get('queryStringParameters') or {}
             material_id = params.get('material_id')
             
             if not material_id:
                 return {
                     'statusCode': 400,
-                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                    'body': json.dumps({'error': 'material_id is required'}),
+                    'headers': response_headers,
+                    'body': json.dumps({'error': 'ID материала не указан'}),
                     'isBase64Encoded': False
                 }
             
-            cursor.execute(
-                "DELETE FROM t_p91447108_ai_improvement_websi.learning_materials WHERE id = %s AND teacher_id = %s",
-                (material_id, user_id)
-            )
+            cursor.execute("""
+                DELETE FROM learning_materials 
+                WHERE id = %s AND teacher_id = %s
+            """, (material_id, user_id))
+            
             conn.commit()
             
             return {
                 'statusCode': 200,
-                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'headers': response_headers,
                 'body': json.dumps({'success': True}),
                 'isBase64Encoded': False
             }
         
-        else:
-            return {
-                'statusCode': 405,
-                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                'body': json.dumps({'error': 'Method not allowed'}),
-                'isBase64Encoded': False
-            }
-    
-    finally:
         cursor.close()
         conn.close()
+        
+        return {
+            'statusCode': 405,
+            'headers': response_headers,
+            'body': json.dumps({'error': 'Метод не поддерживается'}),
+            'isBase64Encoded': False
+        }
+        
+    except Exception as e:
+        return {
+            'statusCode': 500,
+            'headers': response_headers,
+            'body': json.dumps({'error': f'Ошибка сервера: {str(e)}'}),
+            'isBase64Encoded': False
+        }
