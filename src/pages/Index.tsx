@@ -2250,20 +2250,20 @@ P_max = I²R = 2² × 3 = 12 Вт
                 <Card className="p-6 hover:shadow-lg transition-shadow border-2">
                   <div className="flex flex-col h-full">
                     <div className="flex items-start gap-4 mb-4">
-                      <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center flex-shrink-0">
-                        <Icon name="Truck" size={24} className="text-white" />
+                      <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-pink-500 to-rose-500 flex items-center justify-center flex-shrink-0">
+                        <Icon name="Languages" size={24} className="text-white" />
                       </div>
                       <div className="flex-1">
-                        <h3 className="font-bold text-lg mb-1">Яндекс Перевозчик</h3>
-                        <Badge className="bg-orange-100 text-orange-700 mb-2">Логистика</Badge>
+                        <h3 className="font-bold text-lg mb-1">Яндекс Переводчик AI</h3>
+                        <Badge className="bg-pink-100 text-pink-700 mb-2">Перевод и языки</Badge>
                       </div>
                     </div>
                     <p className="text-sm text-muted-foreground mb-4 flex-1">
-                      Платформа для управления грузоперевозками и логистикой с применением AI для оптимизации маршрутов
+                      Нейросетевой переводчик для работы с иностранными источниками, изучения языков и перевода текстов
                     </p>
                     <Button 
                       className="w-full gap-2" 
-                      onClick={() => window.open('https://carrier.yandex.ru/', '_blank')}
+                      onClick={() => window.open('https://translate.yandex.ru/', '_blank')}
                     >
                       <Icon name="ExternalLink" size={16} />
                       Использовать
