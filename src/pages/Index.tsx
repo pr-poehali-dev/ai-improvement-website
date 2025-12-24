@@ -1511,7 +1511,7 @@ P_max = I²R = 2² × 3 = 12 Вт
         </header>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-5 mb-8 h-auto p-1">
+          <TabsList className="grid w-full grid-cols-6 mb-8 h-auto p-1">
             <TabsTrigger value="home" className="gap-2 py-3">
               <Icon name="Home" size={18} />
               <span className="hidden sm:inline">Главная</span>
@@ -1523,6 +1523,10 @@ P_max = I²R = 2² × 3 = 12 Вт
             <TabsTrigger value="tests" className="gap-2 py-3">
               <Icon name="ClipboardList" size={18} />
               <span className="hidden sm:inline">Тесты</span>
+            </TabsTrigger>
+            <TabsTrigger value="ai" className="gap-2 py-3">
+              <Icon name="Brain" size={18} />
+              <span className="hidden sm:inline">AI помощники</span>
             </TabsTrigger>
             <TabsTrigger value="profile" className="gap-2 py-3">
               <Icon name="User" size={18} />
@@ -2116,6 +2120,180 @@ P_max = I²R = 2² × 3 = 12 Вт
                 </div>
               </Card>
             </div>
+          </TabsContent>
+
+          <TabsContent value="ai" className="space-y-6 animate-fade-in">
+            <Card className="p-6">
+              <div className="mb-6">
+                <h2 className="text-2xl font-bold mb-2">AI-инструменты для обучения</h2>
+                <p className="text-muted-foreground">
+                  Современные нейросетевые помощники для эффективного обучения
+                </p>
+              </div>
+
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <Card className="p-6 hover:shadow-lg transition-shadow border-2">
+                  <div className="flex flex-col h-full">
+                    <div className="flex items-start gap-4 mb-4">
+                      <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center flex-shrink-0">
+                        <Icon name="Bot" size={24} className="text-white" />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-bold text-lg mb-1">Яндекс AI (Алиса)</h3>
+                        <Badge className="bg-purple-100 text-purple-700 mb-2">Голосовой помощник</Badge>
+                      </div>
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-4 flex-1">
+                      Голосовой ассистент от Яндекса для быстрых ответов на вопросы, помощи с домашними заданиями и разбора сложных тем
+                    </p>
+                    <Button 
+                      className="w-full gap-2" 
+                      onClick={() => window.open('https://alice.yandex.ru/', '_blank')}
+                    >
+                      <Icon name="ExternalLink" size={16} />
+                      Использовать
+                    </Button>
+                  </div>
+                </Card>
+
+                <Card className="p-6 hover:shadow-lg transition-shadow border-2">
+                  <div className="flex flex-col h-full">
+                    <div className="flex items-start gap-4 mb-4">
+                      <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center flex-shrink-0">
+                        <Icon name="Sparkles" size={24} className="text-white" />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-bold text-lg mb-1">YandexGPT</h3>
+                        <Badge className="bg-blue-100 text-blue-700 mb-2">Текстовая генерация</Badge>
+                      </div>
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-4 flex-1">
+                      Нейросеть для помощи в написании рефератов, пересказа сложных текстов простыми словами и проверки работ
+                    </p>
+                    <Button 
+                      className="w-full gap-2" 
+                      onClick={() => window.open('https://yandex.ru/chat', '_blank')}
+                    >
+                      <Icon name="ExternalLink" size={16} />
+                      Использовать
+                    </Button>
+                  </div>
+                </Card>
+
+                <Card className="p-6 hover:shadow-lg transition-shadow border-2">
+                  <div className="flex flex-col h-full">
+                    <div className="flex items-start gap-4 mb-4">
+                      <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center flex-shrink-0">
+                        <Icon name="MessageSquare" size={24} className="text-white" />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-bold text-lg mb-1">ChatGPT</h3>
+                        <Badge className="bg-green-100 text-green-700 mb-2">Универсальный AI</Badge>
+                      </div>
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-4 flex-1">
+                      Мощный AI-помощник для объяснения любых тем, решения задач и подготовки к экзаменам
+                    </p>
+                    <Button 
+                      className="w-full gap-2" 
+                      onClick={() => window.open('https://chat.openai.com/', '_blank')}
+                    >
+                      <Icon name="ExternalLink" size={16} />
+                      Использовать
+                    </Button>
+                  </div>
+                </Card>
+
+                <Card className="p-6 hover:shadow-lg transition-shadow border-2">
+                  <div className="flex flex-col h-full">
+                    <div className="flex items-start gap-4 mb-4">
+                      <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center flex-shrink-0">
+                        <Icon name="Lightbulb" size={24} className="text-white" />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-bold text-lg mb-1">Claude</h3>
+                        <Badge className="bg-orange-100 text-orange-700 mb-2">Детальные объяснения</Badge>
+                      </div>
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-4 flex-1">
+                      AI для подробного разбора сложных тем, помощи в написании эссе и аналитических работ
+                    </p>
+                    <Button 
+                      className="w-full gap-2" 
+                      onClick={() => window.open('https://claude.ai/', '_blank')}
+                    >
+                      <Icon name="ExternalLink" size={16} />
+                      Использовать
+                    </Button>
+                  </div>
+                </Card>
+
+                <Card className="p-6 hover:shadow-lg transition-shadow border-2">
+                  <div className="flex flex-col h-full">
+                    <div className="flex items-start gap-4 mb-4">
+                      <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-yellow-500 to-amber-500 flex items-center justify-center flex-shrink-0">
+                        <Icon name="Image" size={24} className="text-white" />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-bold text-lg mb-1">Kandinsky</h3>
+                        <Badge className="bg-yellow-100 text-yellow-700 mb-2">Генерация изображений</Badge>
+                      </div>
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-4 flex-1">
+                      Российская нейросеть для создания иллюстраций к докладам, визуализации идей и творческих проектов
+                    </p>
+                    <Button 
+                      className="w-full gap-2" 
+                      onClick={() => window.open('https://fusionbrain.ai/kandinsky', '_blank')}
+                    >
+                      <Icon name="ExternalLink" size={16} />
+                      Использовать
+                    </Button>
+                  </div>
+                </Card>
+
+                <Card className="p-6 hover:shadow-lg transition-shadow border-2">
+                  <div className="flex flex-col h-full">
+                    <div className="flex items-start gap-4 mb-4">
+                      <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-pink-500 to-rose-500 flex items-center justify-center flex-shrink-0">
+                        <Icon name="Languages" size={24} className="text-white" />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-bold text-lg mb-1">Яндекс Переводчик AI</h3>
+                        <Badge className="bg-pink-100 text-pink-700 mb-2">Перевод и языки</Badge>
+                      </div>
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-4 flex-1">
+                      Нейросетевой переводчик для работы с иностранными источниками, изучения языков и перевода текстов
+                    </p>
+                    <Button 
+                      className="w-full gap-2" 
+                      onClick={() => window.open('https://translate.yandex.ru/', '_blank')}
+                    >
+                      <Icon name="ExternalLink" size={16} />
+                      Использовать
+                    </Button>
+                  </div>
+                </Card>
+              </div>
+
+              <div className="mt-8 p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-200">
+                <div className="flex gap-3">
+                  <Icon name="Sparkles" size={20} className="text-blue-600 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <h4 className="font-semibold text-blue-900 mb-2">Как эффективно использовать AI для учёбы</h4>
+                    <ul className="text-sm text-blue-800 space-y-1">
+                      <li>📚 Просите объяснить сложные темы простыми словами</li>
+                      <li>✍️ Используйте для проверки своих работ на ошибки и понятность</li>
+                      <li>💡 Генерируйте идеи для проектов и творческих заданий</li>
+                      <li>🎯 Создавайте тренировочные задания для самопроверки</li>
+                      <li>🌍 Переводите иностранные материалы для расширения знаний</li>
+                      <li>🖼️ Визуализируйте концепции для лучшего запоминания</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </Card>
           </TabsContent>
         </Tabs>
       </div>
