@@ -649,6 +649,15 @@ export default function TeacherDashboard() {
           <TabsContent value="analytics" className="space-y-6">
             <Card className="p-6">
               <h2 className="text-2xl font-bold mb-6">Статистика группы</h2>
+              
+              <div className="mb-8 rounded-lg overflow-hidden border border-gray-200 shadow-sm">
+                <img 
+                  src="https://cdn.poehali.dev/projects/2340c444-1239-4e7b-b126-c7cce6b9f819/files/17988972-d70d-4f38-9473-6eed41e4384a.jpg" 
+                  alt="Визуализация статистики: круговая диаграмма и гистограмма успеваемости" 
+                  className="w-full h-auto"
+                />
+              </div>
+
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
                   <h3 className="font-semibold mb-4">Распределение по успеваемости</h3>
