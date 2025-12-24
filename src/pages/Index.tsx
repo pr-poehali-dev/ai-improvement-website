@@ -2043,6 +2043,15 @@ P_max = I²R = 2² × 3 = 12 Вт
                 <Icon name="BarChart3" className="text-primary" size={28} />
                 Прогресс по предметам
               </h2>
+              
+              <div className="mb-8 rounded-lg overflow-hidden border border-gray-200 shadow-sm">
+                <img 
+                  src="https://cdn.poehali.dev/projects/2340c444-1239-4e7b-b126-c7cce6b9f819/files/17988972-d70d-4f38-9473-6eed41e4384a.jpg" 
+                  alt="Визуализация прогресса: круговая диаграмма и гистограмма" 
+                  className="w-full h-auto"
+                />
+              </div>
+
               <div className="space-y-6">
                 {progressData.map((item, index) => (
                   <div key={index} className="space-y-2">
