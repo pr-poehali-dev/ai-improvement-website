@@ -1693,13 +1693,21 @@ P_max = I²R = 2² × 3 = 12 Вт
           </TabsContent>
 
           <TabsContent value="materials" className="space-y-6 animate-fade-in">
-            <Card className="p-8">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold flex items-center gap-3">
-                  <Icon name="BookOpen" className="text-primary" size={28} />
-                  Учебные материалы
-                </h2>
+            <Card className="p-8 relative overflow-hidden">
+              <div className="absolute inset-0 opacity-5 pointer-events-none">
+                <img 
+                  src="https://cdn.poehali.dev/projects/2340c444-1239-4e7b-b126-c7cce6b9f819/files/2757065a-6d5a-446e-9424-2b3865876902.jpg" 
+                  alt="" 
+                  className="w-full h-full object-cover"
+                />
               </div>
+              <div className="relative z-10">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-2xl font-bold flex items-center gap-3">
+                    <Icon name="BookOpen" className="text-primary" size={28} />
+                    Учебные материалы
+                  </h2>
+                </div>
 
               {loadingMaterials ? (
                 <div className="text-center py-12">
@@ -1756,13 +1764,21 @@ P_max = I²R = 2² × 3 = 12 Вт
                   ))}
                 </div>
               )}
+              </div>
             </Card>
           </TabsContent>
 
           <TabsContent value="tests" className="animate-fade-in">
             {!testStarted ? (
-              <Card className="p-8 text-center bg-gradient-to-br from-card via-primary/5 to-secondary/10 shadow-lg">
-                <div className="max-w-2xl mx-auto">
+              <Card className="p-8 text-center bg-gradient-to-br from-card via-primary/5 to-secondary/10 shadow-lg relative overflow-hidden">
+                <div className="absolute inset-0 opacity-5 pointer-events-none">
+                  <img 
+                    src="https://cdn.poehali.dev/projects/2340c444-1239-4e7b-b126-c7cce6b9f819/files/ddf04a39-4492-4a10-ad8d-981a6c3df932.jpg" 
+                    alt="" 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="max-w-2xl mx-auto relative z-10">
                   <div className="w-24 h-24 bg-gradient-to-br from-primary/20 to-secondary/10 rounded-full flex items-center justify-center mx-auto mb-6 shadow-md">
                     <Icon name="ClipboardList" className="text-primary" size={48} />
                   </div>
@@ -1794,8 +1810,15 @@ P_max = I²R = 2² × 3 = 12 Вт
                 </div>
               </Card>
             ) : showResult ? (
-              <Card className="p-8 bg-gradient-to-br from-card via-primary/5 to-secondary/10 shadow-lg">
-                <div className="max-w-2xl mx-auto text-center">
+              <Card className="p-8 bg-gradient-to-br from-card via-primary/5 to-secondary/10 shadow-lg relative overflow-hidden">
+                <div className="absolute inset-0 opacity-5 pointer-events-none">
+                  <img 
+                    src="https://cdn.poehali.dev/projects/2340c444-1239-4e7b-b126-c7cce6b9f819/files/ddf04a39-4492-4a10-ad8d-981a6c3df932.jpg" 
+                    alt="" 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="max-w-2xl mx-auto text-center relative z-10">
                   <div className={`w-32 h-32 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg ${
                     calculateScore() >= 80 ? 'bg-gradient-to-br from-secondary/30 to-secondary/20' : calculateScore() >= 60 ? 'bg-gradient-to-br from-primary/20 to-secondary/15' : 'bg-gradient-to-br from-destructive/30 to-destructive/20'
                   }`}>
@@ -1862,8 +1885,15 @@ P_max = I²R = 2² × 3 = 12 Вт
                 </div>
               </Card>
             ) : (
-              <Card className="p-8 bg-gradient-to-br from-card to-primary/5 shadow-lg">
-                <div className="mb-8">
+              <Card className="p-8 bg-gradient-to-br from-card to-primary/5 shadow-lg relative overflow-hidden">
+                <div className="absolute inset-0 opacity-5 pointer-events-none">
+                  <img 
+                    src="https://cdn.poehali.dev/projects/2340c444-1239-4e7b-b126-c7cce6b9f819/files/ddf04a39-4492-4a10-ad8d-981a6c3df932.jpg" 
+                    alt="" 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="mb-8 relative z-10">
                   <div className="flex items-center justify-between mb-4">
                     <h2 className="text-2xl font-bold">
                       Вопрос {currentQuestion + 1} из {testQuestions.length}
@@ -1876,7 +1906,7 @@ P_max = I²R = 2² × 3 = 12 Вт
                   <Progress value={((currentQuestion + 1) / testQuestions.length) * 100} className="h-3" />
                 </div>
 
-                <div className="mb-8">
+                <div className="mb-8 relative z-10">
                   <h3 className="text-xl font-semibold mb-6">{testQuestions[currentQuestion].question}</h3>
                   <div className="space-y-3">
                     {testQuestions[currentQuestion].answers.map((answer, index) => (
@@ -1904,7 +1934,7 @@ P_max = I²R = 2² × 3 = 12 Вт
                   </div>
                 </div>
 
-                <div className="flex justify-between">
+                <div className="flex justify-between relative z-10">
                   <Button variant="outline" onClick={restartTest}>
                     <Icon name="X" size={20} className="mr-2" />
                     Отменить

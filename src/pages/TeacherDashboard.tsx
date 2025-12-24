@@ -770,14 +770,22 @@ export default function TeacherDashboard() {
           </TabsContent>
 
           <TabsContent value="materials" className="space-y-6">
-            <Card className="p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold">Учебные материалы</h2>
-                <Button className="gap-2" onClick={() => setShowUploadDialog(true)}>
-                  <Icon name="Upload" size={18} />
-                  Загрузить материал
-                </Button>
+            <Card className="p-6 relative overflow-hidden">
+              <div className="absolute inset-0 opacity-5 pointer-events-none">
+                <img 
+                  src="https://cdn.poehali.dev/projects/2340c444-1239-4e7b-b126-c7cce6b9f819/files/2757065a-6d5a-446e-9424-2b3865876902.jpg" 
+                  alt="" 
+                  className="w-full h-full object-cover"
+                />
               </div>
+              <div className="relative z-10">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-2xl font-bold">Учебные материалы</h2>
+                  <Button className="gap-2" onClick={() => setShowUploadDialog(true)}>
+                    <Icon name="Upload" size={18} />
+                    Загрузить материал
+                  </Button>
+                </div>
               {materials.length === 0 ? (
                 <div className="text-center py-12 text-muted-foreground">
                   <Icon name="FolderOpen" size={48} className="mx-auto mb-4 opacity-50" />
@@ -843,6 +851,7 @@ export default function TeacherDashboard() {
                   ))}
                 </div>
               )}
+              </div>
             </Card>
           </TabsContent>
 
