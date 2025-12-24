@@ -436,7 +436,7 @@ export default function TeacherDashboard() {
         </header>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-4 mb-8">
+          <TabsList className="grid w-full grid-cols-5 mb-8">
             <TabsTrigger value="overview" className="gap-2">
               <Icon name="LayoutDashboard" size={18} />
               Обзор
@@ -452,6 +452,10 @@ export default function TeacherDashboard() {
             <TabsTrigger value="materials" className="gap-2">
               <Icon name="BookOpen" size={18} />
               Материалы
+            </TabsTrigger>
+            <TabsTrigger value="ai" className="gap-2">
+              <Icon name="Brain" size={18} />
+              Нейросеть для обучения
             </TabsTrigger>
           </TabsList>
 
@@ -819,6 +823,180 @@ export default function TeacherDashboard() {
                   ))}
                 </div>
               )}
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="ai" className="space-y-6">
+            <Card className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h2 className="text-2xl font-bold mb-2">AI-инструменты для обучения</h2>
+                  <p className="text-muted-foreground">
+                    Современные нейросетевые помощники для преподавателей
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <Card className="p-6 hover:shadow-lg transition-shadow border-2">
+                  <div className="flex flex-col h-full">
+                    <div className="flex items-start gap-4 mb-4">
+                      <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center flex-shrink-0">
+                        <Icon name="Bot" size={24} className="text-white" />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-bold text-lg mb-1">Яндекс AI (Алиса)</h3>
+                        <Badge className="bg-purple-100 text-purple-700 mb-2">Голосовой помощник</Badge>
+                      </div>
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-4 flex-1">
+                      Голосовой ассистент от Яндекса для быстрых ответов на вопросы, генерации идей и помощи в планировании занятий
+                    </p>
+                    <Button 
+                      className="w-full gap-2" 
+                      onClick={() => window.open('https://alice.yandex.ru/', '_blank')}
+                    >
+                      <Icon name="ExternalLink" size={16} />
+                      Использовать
+                    </Button>
+                  </div>
+                </Card>
+
+                <Card className="p-6 hover:shadow-lg transition-shadow border-2">
+                  <div className="flex flex-col h-full">
+                    <div className="flex items-start gap-4 mb-4">
+                      <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center flex-shrink-0">
+                        <Icon name="Sparkles" size={24} className="text-white" />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-bold text-lg mb-1">YandexGPT</h3>
+                        <Badge className="bg-blue-100 text-blue-700 mb-2">Текстовая генерация</Badge>
+                      </div>
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-4 flex-1">
+                      Нейросеть для создания учебных материалов, конспектов, заданий и проверки текстов студентов
+                    </p>
+                    <Button 
+                      className="w-full gap-2" 
+                      onClick={() => window.open('https://yandex.ru/chat', '_blank')}
+                    >
+                      <Icon name="ExternalLink" size={16} />
+                      Использовать
+                    </Button>
+                  </div>
+                </Card>
+
+                <Card className="p-6 hover:shadow-lg transition-shadow border-2">
+                  <div className="flex flex-col h-full">
+                    <div className="flex items-start gap-4 mb-4">
+                      <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center flex-shrink-0">
+                        <Icon name="MessageSquare" size={24} className="text-white" />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-bold text-lg mb-1">ChatGPT</h3>
+                        <Badge className="bg-green-100 text-green-700 mb-2">Универсальный AI</Badge>
+                      </div>
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-4 flex-1">
+                      Мощный AI-ассистент для разработки учебных программ, объяснения сложных тем и генерации тестов
+                    </p>
+                    <Button 
+                      className="w-full gap-2" 
+                      onClick={() => window.open('https://chat.openai.com/', '_blank')}
+                    >
+                      <Icon name="ExternalLink" size={16} />
+                      Использовать
+                    </Button>
+                  </div>
+                </Card>
+
+                <Card className="p-6 hover:shadow-lg transition-shadow border-2">
+                  <div className="flex flex-col h-full">
+                    <div className="flex items-start gap-4 mb-4">
+                      <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center flex-shrink-0">
+                        <Icon name="Lightbulb" size={24} className="text-white" />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-bold text-lg mb-1">Claude</h3>
+                        <Badge className="bg-orange-100 text-orange-700 mb-2">Аналитика текста</Badge>
+                      </div>
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-4 flex-1">
+                      AI для глубокого анализа текстов, помощи в написании методических материалов и детального разбора заданий
+                    </p>
+                    <Button 
+                      className="w-full gap-2" 
+                      onClick={() => window.open('https://claude.ai/', '_blank')}
+                    >
+                      <Icon name="ExternalLink" size={16} />
+                      Использовать
+                    </Button>
+                  </div>
+                </Card>
+
+                <Card className="p-6 hover:shadow-lg transition-shadow border-2">
+                  <div className="flex flex-col h-full">
+                    <div className="flex items-start gap-4 mb-4">
+                      <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-yellow-500 to-amber-500 flex items-center justify-center flex-shrink-0">
+                        <Icon name="Image" size={24} className="text-white" />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-bold text-lg mb-1">Kandinsky</h3>
+                        <Badge className="bg-yellow-100 text-yellow-700 mb-2">Генерация изображений</Badge>
+                      </div>
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-4 flex-1">
+                      Российская нейросеть для создания иллюстраций к учебным материалам, визуализации концепций и идей
+                    </p>
+                    <Button 
+                      className="w-full gap-2" 
+                      onClick={() => window.open('https://fusionbrain.ai/kandinsky', '_blank')}
+                    >
+                      <Icon name="ExternalLink" size={16} />
+                      Использовать
+                    </Button>
+                  </div>
+                </Card>
+
+                <Card className="p-6 hover:shadow-lg transition-shadow border-2">
+                  <div className="flex flex-col h-full">
+                    <div className="flex items-start gap-4 mb-4">
+                      <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center flex-shrink-0">
+                        <Icon name="FileText" size={24} className="text-white" />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-bold text-lg mb-1">Notion AI</h3>
+                        <Badge className="bg-indigo-100 text-indigo-700 mb-2">Работа с заметками</Badge>
+                      </div>
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-4 flex-1">
+                      Интеграция AI в систему заметок для организации учебного процесса, планирования и автоматизации
+                    </p>
+                    <Button 
+                      className="w-full gap-2" 
+                      onClick={() => window.open('https://www.notion.so/product/ai', '_blank')}
+                    >
+                      <Icon name="ExternalLink" size={16} />
+                      Использовать
+                    </Button>
+                  </div>
+                </Card>
+              </div>
+
+              <div className="mt-8 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                <div className="flex gap-3">
+                  <Icon name="Info" size={20} className="text-blue-600 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <h4 className="font-semibold text-blue-900 mb-1">Советы по использованию AI</h4>
+                    <ul className="text-sm text-blue-800 space-y-1">
+                      <li>• Используйте AI для генерации идей учебных заданий и тестов</li>
+                      <li>• Проверяйте тексты и работы студентов на понятность и корректность</li>
+                      <li>• Создавайте визуальные материалы для более эффективного объяснения</li>
+                      <li>• Автоматизируйте рутинные задачи (планирование, конспекты, отчеты)</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
             </Card>
           </TabsContent>
         </Tabs>
