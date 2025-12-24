@@ -851,6 +851,13 @@ export default function TeacherDashboard() {
                   ))}
                 </div>
               )}
+              <div className="mt-8 pt-8 border-t border-border/50">
+                <img 
+                  src="https://cdn.poehali.dev/projects/2340c444-1239-4e7b-b126-c7cce6b9f819/files/f9232f27-3ad6-4fe8-9aac-67f145452f83.jpg" 
+                  alt="" 
+                  className="w-full h-auto max-h-32 object-contain opacity-20"
+                />
+              </div>
               </div>
             </Card>
           </TabsContent>

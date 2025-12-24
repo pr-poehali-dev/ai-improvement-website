@@ -1764,6 +1764,13 @@ P_max = I²R = 2² × 3 = 12 Вт
                   ))}
                 </div>
               )}
+              <div className="mt-8 pt-8 border-t border-border/50">
+                <img 
+                  src="https://cdn.poehali.dev/projects/2340c444-1239-4e7b-b126-c7cce6b9f819/files/f9232f27-3ad6-4fe8-9aac-67f145452f83.jpg" 
+                  alt="" 
+                  className="w-full h-auto max-h-32 object-contain opacity-20"
+                />
+              </div>
               </div>
             </Card>
           </TabsContent>
@@ -1807,6 +1814,13 @@ P_max = I²R = 2² × 3 = 12 Вт
                     <Icon name="Play" size={20} />
                     Начать тест
                   </Button>
+                  <div className="mt-12 pt-8 border-t border-border/50">
+                    <img 
+                      src="https://cdn.poehali.dev/projects/2340c444-1239-4e7b-b126-c7cce6b9f819/files/e0c31635-e447-42af-b0d8-1e0240f90c6b.jpg" 
+                      alt="" 
+                      className="w-full h-auto max-h-32 object-contain opacity-20"
+                    />
+                  </div>
                 </div>
               </Card>
             ) : showResult ? (
@@ -1882,6 +1896,13 @@ P_max = I²R = 2² × 3 = 12 Вт
                       На главную
                     </Button>
                   </div>
+                  <div className="mt-12 pt-8 border-t border-border/50">
+                    <img 
+                      src="https://cdn.poehali.dev/projects/2340c444-1239-4e7b-b126-c7cce6b9f819/files/e0c31635-e447-42af-b0d8-1e0240f90c6b.jpg" 
+                      alt="" 
+                      className="w-full h-auto max-h-32 object-contain opacity-20"
+                    />
+                  </div>
                 </div>
               </Card>
             ) : (
@@ -1952,6 +1973,13 @@ P_max = I²R = 2² × 3 = 12 Вт
                       </>
                     )}
                   </Button>
+                </div>
+                <div className="mt-8 pt-8 border-t border-border/50 relative z-10">
+                  <img 
+                    src="https://cdn.poehali.dev/projects/2340c444-1239-4e7b-b126-c7cce6b9f819/files/e0c31635-e447-42af-b0d8-1e0240f90c6b.jpg" 
+                    alt="" 
+                    className="w-full h-auto max-h-32 object-contain opacity-20"
+                  />
                 </div>
               </Card>
             )}
