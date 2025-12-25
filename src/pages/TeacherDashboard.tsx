@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import Icon from '@/components/ui/icon';
 import ChatDialog from '@/components/ChatDialog';
+import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 interface Student {
   id: number;
@@ -686,14 +687,6 @@ export default function TeacherDashboard() {
               </div>
               <div className="relative z-10">
               <h2 className="text-2xl font-bold mb-6">Статистика группы</h2>
-              
-              <div className="mb-8 rounded-lg overflow-hidden border border-gray-200 shadow-sm">
-                <img 
-                  src="https://cdn.poehali.dev/projects/2340c444-1239-4e7b-b126-c7cce6b9f819/files/17988972-d70d-4f38-9473-6eed41e4384a.jpg" 
-                  alt="Визуализация статистики: круговая диаграмма и гистограмма успеваемости" 
-                  className="w-full h-auto max-w-4xl mx-auto"
-                />
-              </div>
 
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
@@ -789,6 +782,77 @@ export default function TeacherDashboard() {
                         </span>
                       </div>
                     </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-8 pt-8 border-t border-border/50">
+                <h3 className="text-xl font-bold mb-6">Визуализация данных</h3>
+                <div className="grid md:grid-cols-2 gap-6">
+                  {/* Круговая диаграмма */}
+                  <div className="bg-white rounded-lg p-6 border border-gray-200">
+                    <h4 className="font-semibold mb-4 text-center">Распределение студентов по успеваемости</h4>
+                    <ResponsiveContainer width="100%" height={300}>
+                      <PieChart>
+                        <Pie
+                          data={[
+                            { name: 'Отлично (85-100%)', value: students.filter(s => s.average_score >= 85).length, color: '#22c55e' },
+                            { name: 'Хорошо (70-84%)', value: students.filter(s => s.average_score >= 70 && s.average_score < 85).length, color: '#3b82f6' },
+                            { name: 'Удовл. (50-69%)', value: students.filter(s => s.average_score >= 50 && s.average_score < 70).length, color: '#eab308' },
+                            { name: 'Неудовл. (<50%)', value: students.filter(s => s.average_score < 50).length, color: '#ef4444' }
+                          ]}
+                          cx="50%"
+                          cy="50%"
+                          labelLine={false}
+                          label={({ name, percent }) => `${name.split(' ')[0]}: ${(percent * 100).toFixed(0)}%`}
+                          outerRadius={80}
+                          fill="#8884d8"
+                          dataKey="value"
+                        >
+                          {[
+                            { name: 'Отлично (85-100%)', value: students.filter(s => s.average_score >= 85).length, color: '#22c55e' },
+                            { name: 'Хорошо (70-84%)', value: students.filter(s => s.average_score >= 70 && s.average_score < 85).length, color: '#3b82f6' },
+                            { name: 'Удовл. (50-69%)', value: students.filter(s => s.average_score >= 50 && s.average_score < 70).length, color: '#eab308' },
+                            { name: 'Неудовл. (<50%)', value: students.filter(s => s.average_score < 50).length, color: '#ef4444' }
+                          ].map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={entry.color} />
+                          ))}
+                        </Pie>
+                        <Tooltip />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
+
+                  {/* Гистограмма */}
+                  <div className="bg-white rounded-lg p-6 border border-gray-200">
+                    <h4 className="font-semibold mb-4 text-center">Количество студентов по категориям</h4>
+                    <ResponsiveContainer width="100%" height={300}>
+                      <BarChart
+                        data={[
+                          { category: 'Отлично', count: students.filter(s => s.average_score >= 85).length, fill: '#22c55e' },
+                          { category: 'Хорошо', count: students.filter(s => s.average_score >= 70 && s.average_score < 85).length, fill: '#3b82f6' },
+                          { category: 'Удовл.', count: students.filter(s => s.average_score >= 50 && s.average_score < 70).length, fill: '#eab308' },
+                          { category: 'Неудовл.', count: students.filter(s => s.average_score < 50).length, fill: '#ef4444' }
+                        ]}
+                        margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                      >
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="category" />
+                        <YAxis allowDecimals={false} />
+                        <Tooltip />
+                        <Legend />
+                        <Bar dataKey="count" name="Количество студентов">
+                          {[
+                            { category: 'Отлично', count: students.filter(s => s.average_score >= 85).length, fill: '#22c55e' },
+                            { category: 'Хорошо', count: students.filter(s => s.average_score >= 70 && s.average_score < 85).length, fill: '#3b82f6' },
+                            { category: 'Удовл.', count: students.filter(s => s.average_score >= 50 && s.average_score < 70).length, fill: '#eab308' },
+                            { category: 'Неудовл.', count: students.filter(s => s.average_score < 50).length, fill: '#ef4444' }
+                          ].map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={entry.fill} />
+                          ))}
+                        </Bar>
+                      </BarChart>
+                    </ResponsiveContainer>
                   </div>
                 </div>
               </div>
