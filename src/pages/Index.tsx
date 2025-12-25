@@ -1594,41 +1594,59 @@ P_max = I²R = 2² × 3 = 12 Вт
                   />
                 </div>
                 <div className="relative z-10">
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center shadow-md">
-                    <Icon name="CheckCircle" className="text-primary" size={24} />
-                  </div>
-                  <div>
-                    <div className="text-3xl font-bold">
-                      {isAuthenticated ? userProgress.testsCompleted : studentStats.testsCompleted}
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center shadow-md">
+                      <Icon name="CheckCircle" className="text-primary" size={24} />
                     </div>
-                    <div className="text-sm text-muted-foreground">Тестов пройдено</div>
+                    <div>
+                      <div className="text-3xl font-bold">
+                        {isAuthenticated ? userProgress.testsCompleted : studentStats.testsCompleted}
+                      </div>
+                      <div className="text-sm text-muted-foreground">Тестов пройдено</div>
+                    </div>
                   </div>
                 </div>
               </Card>
 
-              <Card className="p-6 hover:shadow-xl transition-all hover:scale-105">
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-secondary/30 to-secondary/20 flex items-center justify-center shadow-md">
-                    <Icon name="TrendingUp" className="text-secondary" size={24} />
-                  </div>
-                  <div>
-                    <div className="text-3xl font-bold">{studentStats.strongSubjects.length}</div>
-                    <div className="text-sm text-muted-foreground">Сильных раздела</div>
+              <Card className="p-6 hover:shadow-xl transition-all hover:scale-105 relative overflow-hidden">
+                <div className="absolute inset-0 opacity-5 pointer-events-none">
+                  <img 
+                    src="https://cdn.poehali.dev/projects/2340c444-1239-4e7b-b126-c7cce6b9f819/files/bc173832-87d2-47f2-bdc1-94e78125a609.jpg" 
+                    alt="" 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="relative z-10">
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-secondary/30 to-secondary/20 flex items-center justify-center shadow-md">
+                      <Icon name="TrendingUp" className="text-secondary" size={24} />
+                    </div>
+                    <div>
+                      <div className="text-3xl font-bold">{studentStats.strongSubjects.length}</div>
+                      <div className="text-sm text-muted-foreground">Сильных раздела</div>
+                    </div>
                   </div>
                 </div>
               </Card>
 
-              <Card className="p-6 hover:shadow-xl transition-all hover:scale-105">
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-primary/25 to-secondary/15 flex items-center justify-center shadow-md">
-                    <Icon name="Target" className="text-accent" size={24} />
-                  </div>
-                  <div>
-                    <div className="text-3xl font-bold">+12%</div>
-                    <div className="text-sm text-muted-foreground">Рост за месяц</div>
-                  </div>
+              <Card className="p-6 hover:shadow-xl transition-all hover:scale-105 relative overflow-hidden">
+                <div className="absolute inset-0 opacity-5 pointer-events-none">
+                  <img 
+                    src="https://cdn.poehali.dev/projects/2340c444-1239-4e7b-b126-c7cce6b9f819/files/bc173832-87d2-47f2-bdc1-94e78125a609.jpg" 
+                    alt="" 
+                    className="w-full h-full object-cover"
+                  />
                 </div>
+                <div className="relative z-10">
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-primary/25 to-secondary/15 flex items-center justify-center shadow-md">
+                      <Icon name="Target" className="text-accent" size={24} />
+                    </div>
+                    <div>
+                      <div className="text-3xl font-bold">+12%</div>
+                      <div className="text-sm text-muted-foreground">Рост за месяц</div>
+                    </div>
+                  </div>
                 </div>
               </Card>
             </div>
@@ -1642,7 +1660,7 @@ P_max = I²R = 2² × 3 = 12 Вт
                 />
               </div>
               <div className="relative z-10">
-              <div className="flex items-center gap-3 mb-6">
+                <div className="flex items-center gap-3 mb-6">
                 <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-md">
                   <Icon name="Sparkles" className="text-white" size={24} />
                 </div>
@@ -1714,6 +1732,7 @@ P_max = I²R = 2² × 3 = 12 Вт
                     </div>
                   </div>
                 ))}
+                </div>
               </div>
             </Card>
           </TabsContent>
@@ -2214,10 +2233,10 @@ P_max = I²R = 2² × 3 = 12 Вт
                 </div>
                 <div className="relative z-10">
                 <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
-                  <Icon name="Award" className="text-primary" size={20} />
-                  Последние достижения
-                </h3>
-                <div className="space-y-4">
+                    <Icon name="Award" className="text-primary" size={20} />
+                    Последние достижения
+                  </h3>
+                  <div className="space-y-4">
                   <div className="flex items-center gap-3 p-3 rounded-lg bg-yellow-50">
                     <div className="w-10 h-10 rounded-full bg-yellow-200 flex items-center justify-center">
                       <Icon name="Trophy" className="text-yellow-700" size={20} />
@@ -2245,13 +2264,22 @@ P_max = I²R = 2² × 3 = 12 Вт
                       <div className="text-xs text-muted-foreground">100% по математике</div>
                     </div>
                   </div>
+                  </div>
                 </div>
               </Card>
             </div>
           </TabsContent>
 
           <TabsContent value="ai" className="space-y-6 animate-fade-in">
-            <Card className="p-6">
+            <Card className="p-6 relative overflow-hidden">
+              <div className="absolute inset-0 opacity-10 pointer-events-none">
+                <img 
+                  src="https://cdn.poehali.dev/projects/2340c444-1239-4e7b-b126-c7cce6b9f819/files/bc173832-87d2-47f2-bdc1-94e78125a609.jpg" 
+                  alt="" 
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="relative z-10">
               <div className="mb-6">
                 <h2 className="text-2xl font-bold mb-2">AI-инструменты для обучения</h2>
                 <p className="text-muted-foreground">
@@ -2348,6 +2376,7 @@ P_max = I²R = 2² × 3 = 12 Вт
                     </ul>
                   </div>
                 </div>
+              </div>
               </div>
               </div>
             </Card>
