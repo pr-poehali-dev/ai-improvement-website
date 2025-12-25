@@ -280,9 +280,10 @@ export default function TeacherDashboard() {
 
   const getMaterialIcon = (category: string) => {
     if (category === 'Лекции') return 'BookOpen';
-    if (category === 'Практика') return 'Code';
+    if (category === 'Практика') return 'Wrench';
     if (category === 'Тесты') return 'ClipboardCheck';
-    if (category === 'Домашние задания') return 'Home';
+    if (category === 'Домашние задания') return 'PenTool';
+    if (category === 'Дополнительные материалы') return 'FolderPlus';
     return 'FileText';
   };
 
