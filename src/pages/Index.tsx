@@ -8,7 +8,6 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import Icon from '@/components/ui/icon';
-import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 const Index = () => {
   const navigate = useNavigate();
@@ -1540,15 +1539,7 @@ P_max = I²R = 2² × 3 = 12 Вт
           </TabsList>
 
           <TabsContent value="home" className="space-y-6 animate-fade-in">
-            <Card className="p-8 bg-gradient-to-br from-primary/15 via-primary/10 to-secondary/15 border-primary/30 shadow-lg relative overflow-hidden">
-              <div className="absolute inset-0 opacity-10 pointer-events-none">
-                <img 
-                  src="https://cdn.poehali.dev/projects/2340c444-1239-4e7b-b126-c7cce6b9f819/files/4cb89443-4972-46d4-b6c0-5d01313e7652.jpg" 
-                  alt="" 
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div className="relative z-10">
+            <Card className="p-8 bg-gradient-to-br from-primary/15 via-primary/10 to-secondary/15 border-primary/30 shadow-lg">
               <div className="flex flex-col md:flex-row items-center gap-6">
                 <div className="flex-1">
                   <h2 className="text-3xl font-bold mb-3">
@@ -1581,7 +1572,6 @@ P_max = I²R = 2² × 3 = 12 Вт
                     </div>
                   </div>
                 </div>
-              </div>
               </div>
             </Card>
 
@@ -1625,15 +1615,7 @@ P_max = I²R = 2² × 3 = 12 Вт
               </Card>
             </div>
 
-            <Card className="p-8 bg-gradient-to-br from-card via-primary/5 to-secondary/5 shadow-md relative overflow-hidden">
-              <div className="absolute inset-0 opacity-10 pointer-events-none">
-                <img 
-                  src="https://cdn.poehali.dev/projects/2340c444-1239-4e7b-b126-c7cce6b9f819/files/4cb89443-4972-46d4-b6c0-5d01313e7652.jpg" 
-                  alt="" 
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div className="relative z-10">
+            <Card className="p-8 bg-gradient-to-br from-card via-primary/5 to-secondary/5 shadow-md">
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-md">
                   <Icon name="Sparkles" className="text-white" size={24} />
@@ -1706,7 +1688,6 @@ P_max = I²R = 2² × 3 = 12 Вт
                     </div>
                   </div>
                 ))}
-              </div>
               </div>
             </Card>
           </TabsContent>
@@ -2005,15 +1986,7 @@ P_max = I²R = 2² × 3 = 12 Вт
           </TabsContent>
 
           <TabsContent value="profile" className="animate-fade-in">
-            <Card className="p-8 relative overflow-hidden">
-              <div className="absolute inset-0 opacity-10 pointer-events-none">
-                <img 
-                  src="https://cdn.poehali.dev/projects/2340c444-1239-4e7b-b126-c7cce6b9f819/files/4cb89443-4972-46d4-b6c0-5d01313e7652.jpg" 
-                  alt="" 
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div className="relative z-10">
+            <Card className="p-8">
               {isAuthenticated && (
                 <div className="flex justify-between items-center mb-6 pb-4 border-b">
                   <h2 className="text-2xl font-bold">Личный профиль</h2>
@@ -2119,26 +2092,25 @@ P_max = I²R = 2² × 3 = 12 Вт
                   </div>
                 </div>
               </div>
-              </div>
             </Card>
           </TabsContent>
 
           <TabsContent value="analytics" className="space-y-6 animate-fade-in">
-            <Card className="p-8 relative overflow-hidden">
-              <div className="absolute inset-0 opacity-10 pointer-events-none">
-                <img 
-                  src="https://cdn.poehali.dev/projects/2340c444-1239-4e7b-b126-c7cce6b9f819/files/4cb89443-4972-46d4-b6c0-5d01313e7652.jpg" 
-                  alt="" 
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div className="relative z-10">
+            <Card className="p-8">
               <h2 className="text-2xl font-bold mb-6 flex items-center gap-3">
                 <Icon name="BarChart3" className="text-primary" size={28} />
                 Прогресс по предметам
               </h2>
+              
+              <div className="mb-8 rounded-lg overflow-hidden border border-gray-200 shadow-sm">
+                <img 
+                  src="https://cdn.poehali.dev/projects/2340c444-1239-4e7b-b126-c7cce6b9f819/files/17988972-d70d-4f38-9473-6eed41e4384a.jpg" 
+                  alt="Визуализация прогресса: круговая диаграмма и гистограмма" 
+                  className="w-full h-auto"
+                />
+              </div>
 
-              <div className="space-y-6 mb-8">
+              <div className="space-y-6">
                 {progressData.map((item, index) => (
                   <div key={index} className="space-y-2">
                     <div className="flex items-center justify-between">
@@ -2156,86 +2128,10 @@ P_max = I²R = 2² × 3 = 12 Вт
                   </div>
                 ))}
               </div>
-
-              <div className="mt-8 pt-8 border-t border-border/50">
-                <h3 className="text-xl font-bold mb-6">Визуализация данных</h3>
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div className="bg-white rounded-lg p-6 border border-gray-200">
-                    <h4 className="font-semibold mb-4 text-center">Распределение по успеваемости</h4>
-                    <ResponsiveContainer width="100%" height={300}>
-                      <PieChart>
-                        <Pie
-                          data={[
-                            { name: 'Отлично (85-100%)', value: progressData.filter(s => s.score >= 85).length, color: '#22c55e' },
-                            { name: 'Хорошо (70-84%)', value: progressData.filter(s => s.score >= 70 && s.score < 85).length, color: '#3b82f6' },
-                            { name: 'Удовл. (50-69%)', value: progressData.filter(s => s.score >= 50 && s.score < 70).length, color: '#eab308' },
-                            { name: 'Неудовл. (<50%)', value: progressData.filter(s => s.score < 50).length, color: '#ef4444' }
-                          ]}
-                          cx="50%"
-                          cy="50%"
-                          labelLine={false}
-                          label={({ name, percent }) => `${name.split(' ')[0]}: ${(percent * 100).toFixed(0)}%`}
-                          outerRadius={80}
-                          fill="#8884d8"
-                          dataKey="value"
-                        >
-                          {[
-                            { name: 'Отлично (85-100%)', value: progressData.filter(s => s.score >= 85).length, color: '#22c55e' },
-                            { name: 'Хорошо (70-84%)', value: progressData.filter(s => s.score >= 70 && s.score < 85).length, color: '#3b82f6' },
-                            { name: 'Удовл. (50-69%)', value: progressData.filter(s => s.score >= 50 && s.score < 70).length, color: '#eab308' },
-                            { name: 'Неудовл. (<50%)', value: progressData.filter(s => s.score < 50).length, color: '#ef4444' }
-                          ].map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={entry.color} />
-                          ))}
-                        </Pie>
-                        <Tooltip />
-                      </PieChart>
-                    </ResponsiveContainer>
-                  </div>
-
-                  <div className="bg-white rounded-lg p-6 border border-gray-200">
-                    <h4 className="font-semibold mb-4 text-center">Успеваемость по предметам</h4>
-                    <ResponsiveContainer width="100%" height={300}>
-                      <BarChart
-                        data={progressData.map(item => ({
-                          subject: item.subject.split(' ').slice(0, 2).join(' '),
-                          score: item.score,
-                          fill: item.score >= 85 ? '#22c55e' : item.score >= 70 ? '#3b82f6' : item.score >= 50 ? '#eab308' : '#ef4444'
-                        }))}
-                        margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-                      >
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="subject" />
-                        <YAxis domain={[0, 100]} />
-                        <Tooltip />
-                        <Legend />
-                        <Bar dataKey="score" name="Балл">
-                          {progressData.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={
-                              entry.score >= 85 ? '#22c55e' : 
-                              entry.score >= 70 ? '#3b82f6' : 
-                              entry.score >= 50 ? '#eab308' : '#ef4444'
-                            } />
-                          ))}
-                        </Bar>
-                      </BarChart>
-                    </ResponsiveContainer>
-                  </div>
-                </div>
-              </div>
-              </div>
             </Card>
 
             <div className="grid md:grid-cols-2 gap-6">
-              <Card className="p-6 relative overflow-hidden">
-                <div className="absolute inset-0 opacity-10 pointer-events-none">
-                  <img 
-                    src="https://cdn.poehali.dev/projects/2340c444-1239-4e7b-b126-c7cce6b9f819/files/4cb89443-4972-46d4-b6c0-5d01313e7652.jpg" 
-                    alt="" 
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div className="relative z-10">
+              <Card className="p-6">
                 <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
                   <Icon name="Calendar" className="text-primary" size={20} />
                   Активность за неделю
@@ -2253,18 +2149,9 @@ P_max = I²R = 2² × 3 = 12 Вт
                     </div>
                   ))}
                 </div>
-                </div>
               </Card>
 
-              <Card className="p-6 relative overflow-hidden">
-                <div className="absolute inset-0 opacity-10 pointer-events-none">
-                  <img 
-                    src="https://cdn.poehali.dev/projects/2340c444-1239-4e7b-b126-c7cce6b9f819/files/4cb89443-4972-46d4-b6c0-5d01313e7652.jpg" 
-                    alt="" 
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div className="relative z-10">
+              <Card className="p-6">
                 <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
                   <Icon name="Award" className="text-primary" size={20} />
                   Последние достижения
@@ -2298,21 +2185,12 @@ P_max = I²R = 2² × 3 = 12 Вт
                     </div>
                   </div>
                 </div>
-                </div>
               </Card>
             </div>
           </TabsContent>
 
           <TabsContent value="ai" className="space-y-6 animate-fade-in">
-            <Card className="p-6 relative overflow-hidden">
-              <div className="absolute inset-0 opacity-10 pointer-events-none">
-                <img 
-                  src="https://cdn.poehali.dev/projects/2340c444-1239-4e7b-b126-c7cce6b9f819/files/4cb89443-4972-46d4-b6c0-5d01313e7652.jpg" 
-                  alt="" 
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div className="relative z-10">
+            <Card className="p-6">
               <div className="mb-6">
                 <h2 className="text-2xl font-bold mb-2">AI-инструменты для обучения</h2>
                 <p className="text-muted-foreground">
@@ -2409,7 +2287,6 @@ P_max = I²R = 2² × 3 = 12 Вт
                     </ul>
                   </div>
                 </div>
-              </div>
               </div>
             </Card>
           </TabsContent>
