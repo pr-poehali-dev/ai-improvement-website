@@ -518,7 +518,15 @@ export default function TeacherDashboard() {
               </Card>
             </div>
 
-            <Card className="p-6">
+            <Card className="p-6 relative overflow-hidden">
+              <div className="absolute inset-0 opacity-10 pointer-events-none">
+                <img 
+                  src="https://cdn.poehali.dev/projects/2340c444-1239-4e7b-b126-c7cce6b9f819/files/4cb89443-4972-46d4-b6c0-5d01313e7652.jpg" 
+                  alt="" 
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="relative z-10">
               <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
                 <Icon name="AlertTriangle" size={24} />
                 Студенты, требующие внимания
@@ -570,6 +578,7 @@ export default function TeacherDashboard() {
                     Все студенты показывают хорошие результаты! 🎉
                   </p>
                 )}
+              </div>
               </div>
             </Card>
           </TabsContent>
