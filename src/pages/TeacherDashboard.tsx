@@ -533,16 +533,6 @@ export default function TeacherDashboard() {
                 Студенты, требующие внимания
               </h2>
               
-              {students.filter(s => s.average_score < 70).length > 0 && (
-                <div className="mb-6 rounded-lg overflow-hidden border border-orange-200 bg-gradient-to-r from-orange-50 to-amber-50 p-6">
-                  <img 
-                    src="https://cdn.poehali.dev/projects/2340c444-1239-4e7b-b126-c7cce6b9f819/files/afc07bf9-c825-4210-99f9-21b229b3154d.jpg" 
-                    alt="Иллюстрация студентов" 
-                    className="w-full h-auto max-h-48 object-contain opacity-80"
-                  />
-                </div>
-              )}
-              
               <div className="space-y-3">
                 {students.filter(s => s.average_score < 70).map(student => (
                   <div key={student.id} className="p-4 bg-muted rounded-lg flex items-center justify-between">
