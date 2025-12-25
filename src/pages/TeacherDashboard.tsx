@@ -69,6 +69,14 @@ export default function TeacherDashboard() {
   const [chatStudentId, setChatStudentId] = useState<number>(0);
   const [chatStudentName, setChatStudentName] = useState('');
   const [currentUserId, setCurrentUserId] = useState<number>(0);
+  
+  const [showEditDialog, setShowEditDialog] = useState(false);
+  const [selectedMaterialForEdit, setSelectedMaterialForEdit] = useState<Material | null>(null);
+  const [editTitle, setEditTitle] = useState('');
+  const [editDescription, setEditDescription] = useState('');
+  const [editCategory, setEditCategory] = useState('Общее');
+  const [editContent, setEditContent] = useState('');
+  const [updatingMaterial, setUpdatingMaterial] = useState(false);
 
   useEffect(() => {
     const role = localStorage.getItem('user_role');
@@ -269,6 +277,56 @@ export default function TeacherDashboard() {
     } catch (error) {
       console.error('Ошибка удаления материала:', error);
       alert('Не удалось удалить материал');
+    }
+  };
+
+  const handleOpenEditDialog = (material: Material) => {
+    setSelectedMaterialForEdit(material);
+    setEditTitle(material.title);
+    setEditDescription(material.description);
+    setEditCategory(material.category);
+    setEditContent(material.file_url);
+    setShowEditDialog(true);
+  };
+
+  const handleUpdateMaterial = async () => {
+    if (!selectedMaterialForEdit || !editTitle.trim() || !editContent.trim()) {
+      alert('Заполните название и содержание материала');
+      return;
+    }
+
+    setUpdatingMaterial(true);
+    const token = localStorage.getItem('auth_token');
+
+    try {
+      const response = await fetch('https://functions.poehali.dev/370b1dc6-d070-4917-b166-1422d71566fb', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Auth-Token': token!
+        },
+        body: JSON.stringify({
+          material_id: selectedMaterialForEdit.id,
+          title: editTitle,
+          description: editDescription,
+          content: editContent,
+          category: editCategory
+        })
+      });
+
+      if (response.ok) {
+        setShowEditDialog(false);
+        loadMaterials();
+        alert('Материал успешно обновлен!');
+      } else {
+        const errorText = await response.text();
+        alert('Не удалось обновить материал: ' + errorText);
+      }
+    } catch (error) {
+      console.error('Ошибка обновления материала:', error);
+      alert('Не удалось обновить материал');
+    } finally {
+      setUpdatingMaterial(false);
     }
   };
 
@@ -923,6 +981,15 @@ export default function TeacherDashboard() {
                               size="sm" 
                               variant="outline" 
                               className="gap-2"
+                              onClick={() => handleOpenEditDialog(material)}
+                            >
+                              <Icon name="Pencil" size={14} />
+                              Редактировать
+                            </Button>
+                            <Button 
+                              size="sm" 
+                              variant="outline" 
+                              className="gap-2"
                               onClick={() => handleOpenReview(material)}
                             >
                               <Icon name="CheckSquare" size={14} />
@@ -1399,6 +1466,100 @@ export default function TeacherDashboard() {
               </Button>
               <Button onClick={handleAddStudent} disabled={addingStudent || !newStudentEmail.trim()}>
                 {addingStudent ? 'Добавление...' : 'Добавить'}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Material Dialog */}
+      <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Редактировать материал</DialogTitle>
+            <DialogDescription>
+              Измените информацию о материале
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <label className="text-sm font-medium mb-2 block">Название материала *</label>
+              <Input
+                placeholder="Например: Лекция 5 - Алгоритмы"
+                value={editTitle}
+                onChange={(e) => setEditTitle(e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium mb-2 block">Категория</label>
+              <select
+                className="w-full px-3 py-2 border rounded-md"
+                value={editCategory}
+                onChange={(e) => setEditCategory(e.target.value)}
+              >
+                <option value="Общее">Общее</option>
+                <option value="Лекции">Лекции</option>
+                <option value="Практика">Практика</option>
+                <option value="Тесты">Тесты</option>
+                <option value="Домашние задания">Домашние задания</option>
+                <option value="Дополнительные материалы">Дополнительные материалы</option>
+              </select>
+              <div className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
+                <Icon name={getMaterialIcon(editCategory)} size={20} className="text-primary" />
+                <span>Текущая иконка для категории "{editCategory}"</span>
+              </div>
+            </div>
+            <div>
+              <label className="text-sm font-medium mb-2 block">Краткое описание</label>
+              <Textarea
+                placeholder="Краткое описание материала..."
+                value={editDescription}
+                onChange={(e) => setEditDescription(e.target.value)}
+                rows={2}
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium mb-2 block">Содержание материала *</label>
+              <Textarea
+                placeholder="Введите текст лекции, задания или другой учебный материал..."
+                value={editContent}
+                onChange={(e) => setEditContent(e.target.value)}
+                rows={15}
+                className="font-mono"
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                {editContent.length} символов
+              </p>
+            </div>
+            {selectedMaterialForEdit && (
+              <div className="p-3 bg-muted rounded-lg">
+                <div className="flex items-center gap-2 text-sm">
+                  <Icon name="Calendar" size={14} className="text-muted-foreground" />
+                  <span className="text-muted-foreground">Дата создания:</span>
+                  <span className="font-medium">
+                    {new Date(selectedMaterialForEdit.created_at).toLocaleDateString('ru-RU', {
+                      day: 'numeric',
+                      month: 'long',
+                      year: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    })}
+                  </span>
+                </div>
+              </div>
+            )}
+            <div className="flex gap-2 justify-end">
+              <Button variant="outline" onClick={() => {
+                setShowEditDialog(false);
+                setSelectedMaterialForEdit(null);
+              }}>
+                Отмена
+              </Button>
+              <Button 
+                onClick={handleUpdateMaterial} 
+                disabled={updatingMaterial || !editTitle.trim() || !editContent.trim()}
+              >
+                {updatingMaterial ? 'Сохранение...' : 'Сохранить изменения'}
               </Button>
             </div>
           </div>

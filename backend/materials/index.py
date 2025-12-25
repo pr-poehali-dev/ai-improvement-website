@@ -38,7 +38,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             'statusCode': 200,
             'headers': {
                 'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Methods': 'GET, POST, DELETE, OPTIONS',
+                'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
                 'Access-Control-Allow-Headers': 'Content-Type, X-Auth-Token',
                 'Access-Control-Max-Age': '86400'
             },
@@ -251,6 +251,54 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'body': json.dumps({'error': 'Неверное действие'}),
                     'isBase64Encoded': False
                 }
+        
+        elif method == 'PUT':
+            if user_role != 'teacher':
+                return {
+                    'statusCode': 403,
+                    'headers': response_headers,
+                    'body': json.dumps({'error': 'Только преподаватели могут редактировать материалы'}),
+                    'isBase64Encoded': False
+                }
+            
+            body_data = json.loads(event.get('body', '{}'))
+            material_id = body_data.get('material_id')
+            title = body_data.get('title', '').strip()
+            description = body_data.get('description', '').strip()
+            content = body_data.get('content', '').strip()
+            category = body_data.get('category', 'Общее')
+            
+            if not material_id or not title or not content:
+                return {
+                    'statusCode': 400,
+                    'headers': response_headers,
+                    'body': json.dumps({'error': 'ID материала, название и содержание обязательны'}),
+                    'isBase64Encoded': False
+                }
+            
+            cursor.execute("""
+                UPDATE learning_materials 
+                SET title = %s, description = %s, content = %s, 
+                    file_url = %s, category = %s, file_size = %s
+                WHERE id = %s AND teacher_id = %s
+            """, (title, description, content, content, category, len(content), material_id, user_id))
+            
+            if cursor.rowcount == 0:
+                return {
+                    'statusCode': 404,
+                    'headers': response_headers,
+                    'body': json.dumps({'error': 'Материал не найден или у вас нет прав на его редактирование'}),
+                    'isBase64Encoded': False
+                }
+            
+            conn.commit()
+            
+            return {
+                'statusCode': 200,
+                'headers': response_headers,
+                'body': json.dumps({'success': True}),
+                'isBase64Encoded': False
+            }
         
         elif method == 'DELETE':
             if user_role != 'teacher':
