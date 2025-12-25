@@ -665,7 +665,7 @@ export default function TeacherDashboard() {
                 <img 
                   src="https://cdn.poehali.dev/projects/2340c444-1239-4e7b-b126-c7cce6b9f819/files/17988972-d70d-4f38-9473-6eed41e4384a.jpg" 
                   alt="Визуализация статистики: круговая диаграмма и гистограмма успеваемости" 
-                  className="w-full h-auto"
+                  className="w-full h-auto max-w-4xl mx-auto"
                 />
               </div>
 
@@ -771,13 +771,6 @@ export default function TeacherDashboard() {
 
           <TabsContent value="materials" className="space-y-6">
             <Card className="p-6 relative overflow-hidden">
-              <div className="absolute inset-0 opacity-5 pointer-events-none">
-                <img 
-                  src="https://cdn.poehali.dev/projects/2340c444-1239-4e7b-b126-c7cce6b9f819/files/2757065a-6d5a-446e-9424-2b3865876902.jpg" 
-                  alt="" 
-                  className="w-full h-full object-cover"
-                />
-              </div>
               <div className="relative z-10">
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-2xl font-bold">Учебные материалы</h2>
