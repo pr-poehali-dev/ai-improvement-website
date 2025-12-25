@@ -485,18 +485,9 @@ export default function TeacherDashboard() {
                     <div className="text-sm text-muted-foreground">Тестов пройдено</div>
                   </div>
                 </div>
-                </div>
               </Card>
 
-              <Card className="p-6 relative overflow-hidden">
-                <div className="absolute inset-0 opacity-5 pointer-events-none">
-                  <img 
-                    src="https://cdn.poehali.dev/projects/2340c444-1239-4e7b-b126-c7cce6b9f819/files/bc173832-87d2-47f2-bdc1-94e78125a609.jpg" 
-                    alt="" 
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div className="relative z-10">
+              <Card className="p-6">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-lg bg-purple-100 flex items-center justify-center">
                     <Icon name="TrendingUp" size={24} className="text-purple-600" />
@@ -510,18 +501,9 @@ export default function TeacherDashboard() {
                     <div className="text-sm text-muted-foreground">Средний балл</div>
                   </div>
                 </div>
-                </div>
               </Card>
 
-              <Card className="p-6 relative overflow-hidden">
-                <div className="absolute inset-0 opacity-5 pointer-events-none">
-                  <img 
-                    src="https://cdn.poehali.dev/projects/2340c444-1239-4e7b-b126-c7cce6b9f819/files/bc173832-87d2-47f2-bdc1-94e78125a609.jpg" 
-                    alt="" 
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div className="relative z-10">
+              <Card className="p-6">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-lg bg-orange-100 flex items-center justify-center">
                     <Icon name="AlertCircle" size={24} className="text-orange-600" />
@@ -533,19 +515,10 @@ export default function TeacherDashboard() {
                     <div className="text-sm text-muted-foreground">Требует помощи</div>
                   </div>
                 </div>
-                </div>
               </Card>
             </div>
 
-            <Card className="p-6 relative overflow-hidden">
-              <div className="absolute inset-0 opacity-10 pointer-events-none">
-                <img 
-                  src="https://cdn.poehali.dev/projects/2340c444-1239-4e7b-b126-c7cce6b9f819/files/bc173832-87d2-47f2-bdc1-94e78125a609.jpg" 
-                  alt="" 
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div className="relative z-10">
+            <Card className="p-6">
               <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
                 <Icon name="AlertTriangle" size={24} />
                 Студенты, требующие внимания
@@ -598,20 +571,11 @@ export default function TeacherDashboard() {
                   </p>
                 )}
               </div>
-              </div>
             </Card>
           </TabsContent>
 
           <TabsContent value="students" className="space-y-6">
-            <Card className="p-6 relative overflow-hidden">
-              <div className="absolute inset-0 opacity-10 pointer-events-none">
-                <img 
-                  src="https://cdn.poehali.dev/projects/2340c444-1239-4e7b-b126-c7cce6b9f819/files/bc173832-87d2-47f2-bdc1-94e78125a609.jpg" 
-                  alt="" 
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div className="relative z-10">
+            <Card className="p-6">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-2xl font-bold">Список студентов</h2>
                 <Button className="gap-2" onClick={() => setShowAddDialog(true)}>
@@ -690,20 +654,11 @@ export default function TeacherDashboard() {
                   })}
                 </div>
               )}
-              </div>
             </Card>
           </TabsContent>
 
           <TabsContent value="analytics" className="space-y-6">
-            <Card className="p-6 relative overflow-hidden">
-              <div className="absolute inset-0 opacity-10 pointer-events-none">
-                <img 
-                  src="https://cdn.poehali.dev/projects/2340c444-1239-4e7b-b126-c7cce6b9f819/files/bc173832-87d2-47f2-bdc1-94e78125a609.jpg" 
-                  alt="" 
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div className="relative z-10">
+            <Card className="p-6">
               <h2 className="text-2xl font-bold mb-6">Статистика группы</h2>
               
               <div className="mb-8 rounded-lg overflow-hidden border border-gray-200 shadow-sm">
@@ -811,19 +766,11 @@ export default function TeacherDashboard() {
                   </div>
                 </div>
               </div>
-              </div>
             </Card>
           </TabsContent>
 
           <TabsContent value="materials" className="space-y-6">
             <Card className="p-6 relative overflow-hidden">
-              <div className="absolute inset-0 opacity-10 pointer-events-none">
-                <img 
-                  src="https://cdn.poehali.dev/projects/2340c444-1239-4e7b-b126-c7cce6b9f819/files/bc173832-87d2-47f2-bdc1-94e78125a609.jpg" 
-                  alt="" 
-                  className="w-full h-full object-cover"
-                />
-              </div>
               <div className="relative z-10">
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-2xl font-bold">Учебные материалы</h2>
@@ -909,15 +856,7 @@ export default function TeacherDashboard() {
           </TabsContent>
 
           <TabsContent value="ai" className="space-y-6">
-            <Card className="p-6 relative overflow-hidden">
-              <div className="absolute inset-0 opacity-10 pointer-events-none">
-                <img 
-                  src="https://cdn.poehali.dev/projects/2340c444-1239-4e7b-b126-c7cce6b9f819/files/bc173832-87d2-47f2-bdc1-94e78125a609.jpg" 
-                  alt="" 
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div className="relative z-10">
+            <Card className="p-6">
               <div className="flex items-center justify-between mb-6">
                 <div>
                   <h2 className="text-2xl font-bold mb-2">AI-инструменты для обучения</h2>
@@ -1014,7 +953,6 @@ export default function TeacherDashboard() {
                     </ul>
                   </div>
                 </div>
-              </div>
               </div>
             </Card>
           </TabsContent>
