@@ -771,6 +771,13 @@ export default function TeacherDashboard() {
 
           <TabsContent value="materials" className="space-y-6">
             <Card className="p-6 relative overflow-hidden">
+              <div className="absolute inset-0 opacity-10 pointer-events-none">
+                <img 
+                  src="https://cdn.poehali.dev/projects/2340c444-1239-4e7b-b126-c7cce6b9f819/files/4cb89443-4972-46d4-b6c0-5d01313e7652.jpg" 
+                  alt="" 
+                  className="w-full h-full object-cover"
+                />
+              </div>
               <div className="relative z-10">
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-2xl font-bold">Учебные материалы</h2>

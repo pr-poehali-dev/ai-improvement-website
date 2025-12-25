@@ -1696,7 +1696,7 @@ P_max = I²R = 2² × 3 = 12 Вт
             <Card className="p-8 relative overflow-hidden">
               <div className="absolute inset-0 opacity-10 pointer-events-none">
                 <img 
-                  src="https://cdn.poehali.dev/projects/2340c444-1239-4e7b-b126-c7cce6b9f819/files/bc173832-87d2-47f2-bdc1-94e78125a609.jpg" 
+                  src="https://cdn.poehali.dev/projects/2340c444-1239-4e7b-b126-c7cce6b9f819/files/4cb89443-4972-46d4-b6c0-5d01313e7652.jpg" 
                   alt="" 
                   className="w-full h-full object-cover"
                 />
@@ -1780,7 +1780,7 @@ P_max = I²R = 2² × 3 = 12 Вт
               <Card className="p-8 text-center bg-gradient-to-br from-card via-primary/5 to-secondary/10 shadow-lg relative overflow-hidden">
                 <div className="absolute inset-0 opacity-10 pointer-events-none">
                   <img 
-                    src="https://cdn.poehali.dev/projects/2340c444-1239-4e7b-b126-c7cce6b9f819/files/bc173832-87d2-47f2-bdc1-94e78125a609.jpg" 
+                    src="https://cdn.poehali.dev/projects/2340c444-1239-4e7b-b126-c7cce6b9f819/files/4cb89443-4972-46d4-b6c0-5d01313e7652.jpg" 
                     alt="" 
                     className="w-full h-full object-cover"
                   />
@@ -1909,7 +1909,7 @@ P_max = I²R = 2² × 3 = 12 Вт
               <Card className="p-8 bg-gradient-to-br from-card to-primary/5 shadow-lg relative overflow-hidden">
                 <div className="absolute inset-0 opacity-10 pointer-events-none">
                   <img 
-                    src="https://cdn.poehali.dev/projects/2340c444-1239-4e7b-b126-c7cce6b9f819/files/bc173832-87d2-47f2-bdc1-94e78125a609.jpg" 
+                    src="https://cdn.poehali.dev/projects/2340c444-1239-4e7b-b126-c7cce6b9f819/files/4cb89443-4972-46d4-b6c0-5d01313e7652.jpg" 
                     alt="" 
                     className="w-full h-full object-cover"
                   />
