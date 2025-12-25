@@ -69,6 +69,14 @@ export default function TeacherDashboard() {
   const [chatStudentId, setChatStudentId] = useState<number>(0);
   const [chatStudentName, setChatStudentName] = useState('');
   const [currentUserId, setCurrentUserId] = useState<number>(0);
+  
+  const [showEditDialog, setShowEditDialog] = useState(false);
+  const [selectedMaterialForEdit, setSelectedMaterialForEdit] = useState<Material | null>(null);
+  const [editTitle, setEditTitle] = useState('');
+  const [editDescription, setEditDescription] = useState('');
+  const [editCategory, setEditCategory] = useState('Общее');
+  const [editContent, setEditContent] = useState('');
+  const [updatingMaterial, setUpdatingMaterial] = useState(false);
 
   useEffect(() => {
     const role = localStorage.getItem('user_role');
@@ -269,6 +277,56 @@ export default function TeacherDashboard() {
     } catch (error) {
       console.error('Ошибка удаления материала:', error);
       alert('Не удалось удалить материал');
+    }
+  };
+
+  const handleOpenEditDialog = (material: Material) => {
+    setSelectedMaterialForEdit(material);
+    setEditTitle(material.title);
+    setEditDescription(material.description);
+    setEditCategory(material.category);
+    setEditContent(material.file_url);
+    setShowEditDialog(true);
+  };
+
+  const handleUpdateMaterial = async () => {
+    if (!selectedMaterialForEdit || !editTitle.trim() || !editContent.trim()) {
+      alert('Заполните название и содержание материала');
+      return;
+    }
+
+    setUpdatingMaterial(true);
+    const token = localStorage.getItem('auth_token');
+
+    try {
+      const response = await fetch('https://functions.poehali.dev/370b1dc6-d070-4917-b166-1422d71566fb', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Auth-Token': token!
+        },
+        body: JSON.stringify({
+          material_id: selectedMaterialForEdit.id,
+          title: editTitle,
+          description: editDescription,
+          content: editContent,
+          category: editCategory
+        })
+      });
+
+      if (response.ok) {
+        setShowEditDialog(false);
+        loadMaterials();
+        alert('Материал успешно обновлен!');
+      } else {
+        const errorText = await response.text();
+        alert('Не удалось обновить материал: ' + errorText);
+      }
+    } catch (error) {
+      console.error('Ошибка обновления материала:', error);
+      alert('Не удалось обновить материал');
+    } finally {
+      setUpdatingMaterial(false);
     }
   };
 
@@ -609,69 +667,81 @@ export default function TeacherDashboard() {
                   <p className="text-sm">Нажмите "Добавить студента" чтобы начать</p>
                 </div>
               ) : (
-                <div className="space-y-3">
-                  {students.map(student => {
-                    const badge = getPerformanceBadge(student.average_score);
-                    return (
-                      <div key={student.id} className="p-5 bg-muted rounded-lg hover:bg-muted/80 transition-colors">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-4 flex-1">
-                            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white text-xl font-bold">
-                              {student.full_name.split(' ').map(n => n[0]).join('')}
-                            </div>
-                            <div className="flex-1">
-                              <div className="flex items-center gap-3 mb-1">
-                                <p className="font-bold text-lg">{student.full_name}</p>
-                                <Badge className={badge.color}>{badge.text}</Badge>
+                <>
+                  {students.length > 0 && (
+                    <div className="mb-6 rounded-lg overflow-hidden">
+                      <img 
+                        src="https://cdn.poehali.dev/projects/2340c444-1239-4e7b-b126-c7cce6b9f819/files/afc07bf9-c825-4210-99f9-21b229b3154d.jpg" 
+                        alt="Иллюстрация студентов" 
+                        className="w-full h-auto max-h-64 object-contain opacity-70"
+                      />
+                    </div>
+                  )}
+                  
+                  <div className="space-y-3">
+                    {students.map(student => {
+                      const badge = getPerformanceBadge(student.average_score);
+                      return (
+                        <div key={student.id} className="p-5 bg-muted rounded-lg hover:bg-muted/80 transition-colors">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-4 flex-1">
+                              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white text-xl font-bold">
+                                {student.full_name.split(' ').map(n => n[0]).join('')}
                               </div>
-                              <p className="text-sm text-muted-foreground mb-2">{student.email}</p>
-                              <div className="flex items-center gap-4 text-sm">
-                                <span className="flex items-center gap-1">
-                                  <Icon name="CheckCircle" size={14} className="text-green-600" />
-                                  {student.tests_completed} тестов
-                                </span>
-                                <span className="flex items-center gap-1">
-                                  <Icon name="Award" size={14} className="text-blue-600" />
-                                  {student.average_score}% средний балл
-                                </span>
-                                {student.last_activity && (
+                              <div className="flex-1">
+                                <div className="flex items-center gap-3 mb-1">
+                                  <p className="font-bold text-lg">{student.full_name}</p>
+                                  <Badge className={badge.color}>{badge.text}</Badge>
+                                </div>
+                                <p className="text-sm text-muted-foreground mb-2">{student.email}</p>
+                                <div className="flex items-center gap-4 text-sm">
                                   <span className="flex items-center gap-1">
-                                    <Icon name="Clock" size={14} className="text-muted-foreground" />
-                                    {new Date(student.last_activity).toLocaleDateString('ru-RU')}
+                                    <Icon name="CheckCircle" size={14} className="text-green-600" />
+                                    {student.tests_completed} тестов
                                   </span>
-                                )}
+                                  <span className="flex items-center gap-1">
+                                    <Icon name="Award" size={14} className="text-blue-600" />
+                                    {student.average_score}% средний балл
+                                  </span>
+                                  {student.last_activity && (
+                                    <span className="flex items-center gap-1">
+                                      <Icon name="Clock" size={14} className="text-muted-foreground" />
+                                      {new Date(student.last_activity).toLocaleDateString('ru-RU')}
+                                    </span>
+                                  )}
+                                </div>
                               </div>
                             </div>
-                          </div>
-                          <div className="flex gap-2">
-                            <Button 
-                              size="sm" 
-                              variant="outline" 
-                              className="gap-2"
-                              onClick={() => loadStudentDetails(student.id)}
-                            >
-                              <Icon name="Eye" size={16} />
-                              Подробнее
-                            </Button>
-                            <Button 
-                              size="sm" 
-                              variant="outline" 
-                              className="gap-2"
-                              onClick={() => {
-                                setChatStudentId(student.id);
-                                setChatStudentName(student.full_name);
-                                setShowChatDialog(true);
-                              }}
-                            >
-                              <Icon name="MessageCircle" size={16} />
-                              Чат
-                            </Button>
+                            <div className="flex gap-2">
+                              <Button 
+                                size="sm" 
+                                variant="outline" 
+                                className="gap-2"
+                                onClick={() => loadStudentDetails(student.id)}
+                              >
+                                <Icon name="Eye" size={16} />
+                                Подробнее
+                              </Button>
+                              <Button 
+                                size="sm" 
+                                variant="outline" 
+                                className="gap-2"
+                                onClick={() => {
+                                  setChatStudentId(student.id);
+                                  setChatStudentName(student.full_name);
+                                  setShowChatDialog(true);
+                                }}
+                              >
+                                <Icon name="MessageCircle" size={16} />
+                                Чат
+                              </Button>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    );
-                  })}
-                </div>
+                      );
+                    })}
+                  </div>
+                </>
               )}
               </div>
             </Card>
@@ -918,6 +988,15 @@ export default function TeacherDashboard() {
                             >
                               <Icon name="Eye" size={14} />
                               Просмотр
+                            </Button>
+                            <Button 
+                              size="sm" 
+                              variant="outline" 
+                              className="gap-2"
+                              onClick={() => handleOpenEditDialog(material)}
+                            >
+                              <Icon name="Pencil" size={14} />
+                              Редактировать
                             </Button>
                             <Button 
                               size="sm" 
@@ -1399,6 +1478,100 @@ export default function TeacherDashboard() {
               </Button>
               <Button onClick={handleAddStudent} disabled={addingStudent || !newStudentEmail.trim()}>
                 {addingStudent ? 'Добавление...' : 'Добавить'}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Material Dialog */}
+      <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Редактировать материал</DialogTitle>
+            <DialogDescription>
+              Измените информацию о материале
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <label className="text-sm font-medium mb-2 block">Название материала *</label>
+              <Input
+                placeholder="Например: Лекция 5 - Алгоритмы"
+                value={editTitle}
+                onChange={(e) => setEditTitle(e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium mb-2 block">Категория</label>
+              <select
+                className="w-full px-3 py-2 border rounded-md"
+                value={editCategory}
+                onChange={(e) => setEditCategory(e.target.value)}
+              >
+                <option value="Общее">Общее</option>
+                <option value="Лекции">Лекции</option>
+                <option value="Практика">Практика</option>
+                <option value="Тесты">Тесты</option>
+                <option value="Домашние задания">Домашние задания</option>
+                <option value="Дополнительные материалы">Дополнительные материалы</option>
+              </select>
+              <div className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
+                <Icon name={getMaterialIcon(editCategory)} size={20} className="text-primary" />
+                <span>Текущая иконка для категории "{editCategory}"</span>
+              </div>
+            </div>
+            <div>
+              <label className="text-sm font-medium mb-2 block">Краткое описание</label>
+              <Textarea
+                placeholder="Краткое описание материала..."
+                value={editDescription}
+                onChange={(e) => setEditDescription(e.target.value)}
+                rows={2}
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium mb-2 block">Содержание материала *</label>
+              <Textarea
+                placeholder="Введите текст лекции, задания или другой учебный материал..."
+                value={editContent}
+                onChange={(e) => setEditContent(e.target.value)}
+                rows={15}
+                className="font-mono"
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                {editContent.length} символов
+              </p>
+            </div>
+            {selectedMaterialForEdit && (
+              <div className="p-3 bg-muted rounded-lg">
+                <div className="flex items-center gap-2 text-sm">
+                  <Icon name="Calendar" size={14} className="text-muted-foreground" />
+                  <span className="text-muted-foreground">Дата создания:</span>
+                  <span className="font-medium">
+                    {new Date(selectedMaterialForEdit.created_at).toLocaleDateString('ru-RU', {
+                      day: 'numeric',
+                      month: 'long',
+                      year: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    })}
+                  </span>
+                </div>
+              </div>
+            )}
+            <div className="flex gap-2 justify-end">
+              <Button variant="outline" onClick={() => {
+                setShowEditDialog(false);
+                setSelectedMaterialForEdit(null);
+              }}>
+                Отмена
+              </Button>
+              <Button 
+                onClick={handleUpdateMaterial} 
+                disabled={updatingMaterial || !editTitle.trim() || !editContent.trim()}
+              >
+                {updatingMaterial ? 'Сохранение...' : 'Сохранить изменения'}
               </Button>
             </div>
           </div>
