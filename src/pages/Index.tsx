@@ -1694,9 +1694,9 @@ P_max = I²R = 2² × 3 = 12 Вт
 
           <TabsContent value="materials" className="space-y-6 animate-fade-in">
             <Card className="p-8 relative overflow-hidden">
-              <div className="absolute inset-0 opacity-5 pointer-events-none">
+              <div className="absolute inset-0 opacity-10 pointer-events-none">
                 <img 
-                  src="https://cdn.poehali.dev/projects/2340c444-1239-4e7b-b126-c7cce6b9f819/files/2757065a-6d5a-446e-9424-2b3865876902.jpg" 
+                  src="https://cdn.poehali.dev/projects/2340c444-1239-4e7b-b126-c7cce6b9f819/files/bc173832-87d2-47f2-bdc1-94e78125a609.jpg" 
                   alt="" 
                   className="w-full h-full object-cover"
                 />
@@ -1778,9 +1778,9 @@ P_max = I²R = 2² × 3 = 12 Вт
           <TabsContent value="tests" className="animate-fade-in">
             {!testStarted ? (
               <Card className="p-8 text-center bg-gradient-to-br from-card via-primary/5 to-secondary/10 shadow-lg relative overflow-hidden">
-                <div className="absolute inset-0 opacity-5 pointer-events-none">
+                <div className="absolute inset-0 opacity-10 pointer-events-none">
                   <img 
-                    src="https://cdn.poehali.dev/projects/2340c444-1239-4e7b-b126-c7cce6b9f819/files/ddf04a39-4492-4a10-ad8d-981a6c3df932.jpg" 
+                    src="https://cdn.poehali.dev/projects/2340c444-1239-4e7b-b126-c7cce6b9f819/files/bc173832-87d2-47f2-bdc1-94e78125a609.jpg" 
                     alt="" 
                     className="w-full h-full object-cover"
                   />
@@ -1907,9 +1907,9 @@ P_max = I²R = 2² × 3 = 12 Вт
               </Card>
             ) : (
               <Card className="p-8 bg-gradient-to-br from-card to-primary/5 shadow-lg relative overflow-hidden">
-                <div className="absolute inset-0 opacity-5 pointer-events-none">
+                <div className="absolute inset-0 opacity-10 pointer-events-none">
                   <img 
-                    src="https://cdn.poehali.dev/projects/2340c444-1239-4e7b-b126-c7cce6b9f819/files/ddf04a39-4492-4a10-ad8d-981a6c3df932.jpg" 
+                    src="https://cdn.poehali.dev/projects/2340c444-1239-4e7b-b126-c7cce6b9f819/files/bc173832-87d2-47f2-bdc1-94e78125a609.jpg" 
                     alt="" 
                     className="w-full h-full object-cover"
                   />
