@@ -667,69 +667,81 @@ export default function TeacherDashboard() {
                   <p className="text-sm">Нажмите "Добавить студента" чтобы начать</p>
                 </div>
               ) : (
-                <div className="space-y-3">
-                  {students.map(student => {
-                    const badge = getPerformanceBadge(student.average_score);
-                    return (
-                      <div key={student.id} className="p-5 bg-muted rounded-lg hover:bg-muted/80 transition-colors">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-4 flex-1">
-                            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white text-xl font-bold">
-                              {student.full_name.split(' ').map(n => n[0]).join('')}
-                            </div>
-                            <div className="flex-1">
-                              <div className="flex items-center gap-3 mb-1">
-                                <p className="font-bold text-lg">{student.full_name}</p>
-                                <Badge className={badge.color}>{badge.text}</Badge>
+                <>
+                  {students.length > 0 && (
+                    <div className="mb-6 rounded-lg overflow-hidden">
+                      <img 
+                        src="https://cdn.poehali.dev/projects/2340c444-1239-4e7b-b126-c7cce6b9f819/files/afc07bf9-c825-4210-99f9-21b229b3154d.jpg" 
+                        alt="Иллюстрация студентов" 
+                        className="w-full h-auto max-h-64 object-contain opacity-70"
+                      />
+                    </div>
+                  )}
+                  
+                  <div className="space-y-3">
+                    {students.map(student => {
+                      const badge = getPerformanceBadge(student.average_score);
+                      return (
+                        <div key={student.id} className="p-5 bg-muted rounded-lg hover:bg-muted/80 transition-colors">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-4 flex-1">
+                              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white text-xl font-bold">
+                                {student.full_name.split(' ').map(n => n[0]).join('')}
                               </div>
-                              <p className="text-sm text-muted-foreground mb-2">{student.email}</p>
-                              <div className="flex items-center gap-4 text-sm">
-                                <span className="flex items-center gap-1">
-                                  <Icon name="CheckCircle" size={14} className="text-green-600" />
-                                  {student.tests_completed} тестов
-                                </span>
-                                <span className="flex items-center gap-1">
-                                  <Icon name="Award" size={14} className="text-blue-600" />
-                                  {student.average_score}% средний балл
-                                </span>
-                                {student.last_activity && (
+                              <div className="flex-1">
+                                <div className="flex items-center gap-3 mb-1">
+                                  <p className="font-bold text-lg">{student.full_name}</p>
+                                  <Badge className={badge.color}>{badge.text}</Badge>
+                                </div>
+                                <p className="text-sm text-muted-foreground mb-2">{student.email}</p>
+                                <div className="flex items-center gap-4 text-sm">
                                   <span className="flex items-center gap-1">
-                                    <Icon name="Clock" size={14} className="text-muted-foreground" />
-                                    {new Date(student.last_activity).toLocaleDateString('ru-RU')}
+                                    <Icon name="CheckCircle" size={14} className="text-green-600" />
+                                    {student.tests_completed} тестов
                                   </span>
-                                )}
+                                  <span className="flex items-center gap-1">
+                                    <Icon name="Award" size={14} className="text-blue-600" />
+                                    {student.average_score}% средний балл
+                                  </span>
+                                  {student.last_activity && (
+                                    <span className="flex items-center gap-1">
+                                      <Icon name="Clock" size={14} className="text-muted-foreground" />
+                                      {new Date(student.last_activity).toLocaleDateString('ru-RU')}
+                                    </span>
+                                  )}
+                                </div>
                               </div>
                             </div>
-                          </div>
-                          <div className="flex gap-2">
-                            <Button 
-                              size="sm" 
-                              variant="outline" 
-                              className="gap-2"
-                              onClick={() => loadStudentDetails(student.id)}
-                            >
-                              <Icon name="Eye" size={16} />
-                              Подробнее
-                            </Button>
-                            <Button 
-                              size="sm" 
-                              variant="outline" 
-                              className="gap-2"
-                              onClick={() => {
-                                setChatStudentId(student.id);
-                                setChatStudentName(student.full_name);
-                                setShowChatDialog(true);
-                              }}
-                            >
-                              <Icon name="MessageCircle" size={16} />
-                              Чат
-                            </Button>
+                            <div className="flex gap-2">
+                              <Button 
+                                size="sm" 
+                                variant="outline" 
+                                className="gap-2"
+                                onClick={() => loadStudentDetails(student.id)}
+                              >
+                                <Icon name="Eye" size={16} />
+                                Подробнее
+                              </Button>
+                              <Button 
+                                size="sm" 
+                                variant="outline" 
+                                className="gap-2"
+                                onClick={() => {
+                                  setChatStudentId(student.id);
+                                  setChatStudentName(student.full_name);
+                                  setShowChatDialog(true);
+                                }}
+                              >
+                                <Icon name="MessageCircle" size={16} />
+                                Чат
+                              </Button>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    );
-                  })}
-                </div>
+                      );
+                    })}
+                  </div>
+                </>
               )}
               </div>
             </Card>
