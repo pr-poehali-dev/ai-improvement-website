@@ -2335,6 +2335,14 @@ P_max = I²R = 2² × 3 = 12 Вт
                     <p className="text-sm text-muted-foreground mb-4 flex-1">
                       Голосовой ассистент от Яндекса для быстрых ответов на вопросы, помощи с домашними заданиями и разбора сложных тем
                     </p>
+                    <div className="mb-4 p-3 bg-muted/50 rounded-lg border border-border">
+                      <div className="text-xs font-semibold text-muted-foreground mb-2">Примеры запросов:</div>
+                      <div className="space-y-1 text-xs text-muted-foreground">
+                        <div>• "Объясни закон Ома простыми словами"</div>
+                        <div>• "Помоги решить квадратное уравнение"</div>
+                        <div>• "Расскажи о Второй мировой войне"</div>
+                      </div>
+                    </div>
                     <Button 
                       className="w-full gap-2" 
                       onClick={() => window.open('https://alice.yandex.ru/', '_blank')}
@@ -2359,6 +2367,14 @@ P_max = I²R = 2² × 3 = 12 Вт
                     <p className="text-sm text-muted-foreground mb-4 flex-1">
                       Нейросеть для помощи в написании рефератов, пересказа сложных текстов простыми словами и проверки работ
                     </p>
+                    <div className="mb-4 p-3 bg-muted/50 rounded-lg border border-border">
+                      <div className="text-xs font-semibold text-muted-foreground mb-2">Примеры запросов:</div>
+                      <div className="space-y-1 text-xs text-muted-foreground">
+                        <div>• "Напиши реферат про изобретение транзистора"</div>
+                        <div>• "Объясни теорему Пифагора для 7 класса"</div>
+                        <div>• "Проверь мое эссе на грамматику и логику"</div>
+                      </div>
+                    </div>
                     <Button 
                       className="w-full gap-2" 
                       onClick={() => window.open('https://yandex.ru/chat', '_blank')}
@@ -2383,6 +2399,14 @@ P_max = I²R = 2² × 3 = 12 Вт
                     <p className="text-sm text-muted-foreground mb-4 flex-1">
                       Нейросетевой переводчик для работы с иностранными источниками, изучения языков и перевода текстов
                     </p>
+                    <div className="mb-4 p-3 bg-muted/50 rounded-lg border border-border">
+                      <div className="text-xs font-semibold text-muted-foreground mb-2">Примеры запросов:</div>
+                      <div className="space-y-1 text-xs text-muted-foreground">
+                        <div>• Перевод научных статей с английского</div>
+                        <div>• Проверка переводов домашних заданий</div>
+                        <div>• Изучение терминов на иностранных языках</div>
+                      </div>
+                    </div>
                     <Button 
                       className="w-full gap-2" 
                       onClick={() => window.open('https://translate.yandex.ru/', '_blank')}
