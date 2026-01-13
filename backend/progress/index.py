@@ -139,6 +139,50 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'headers': headers,
                     'body': json.dumps({'success': True, 'message': 'Тема отмечена как изученная'})
                 }
+            
+            elif action == 'mark_lecture_viewed':
+                lecture_data = {
+                    'title': body_data.get('title', ''),
+                    'duration': body_data.get('duration', ''),
+                    'viewed_at': datetime.utcnow().isoformat()
+                }
+                
+                cursor.execute(
+                    "SELECT viewed_lectures FROM user_progress WHERE user_id = %s",
+                    (user_id,)
+                )
+                row = cursor.fetchone()
+                
+                if row:
+                    viewed_lectures = row['viewed_lectures'] or []
+                    
+                    # Check if lecture already viewed (by title)
+                    existing = next((i for i, l in enumerate(viewed_lectures) if l.get('title') == lecture_data['title']), None)
+                    
+                    if existing is not None:
+                        # Update view time
+                        viewed_lectures[existing] = lecture_data
+                    else:
+                        # Add new lecture
+                        viewed_lectures.append(lecture_data)
+                    
+                    cursor.execute(
+                        "UPDATE user_progress SET viewed_lectures = %s, last_activity = %s WHERE user_id = %s",
+                        (json.dumps(viewed_lectures), datetime.utcnow(), user_id)
+                    )
+                else:
+                    cursor.execute(
+                        "INSERT INTO user_progress (user_id, viewed_lectures, last_activity) VALUES (%s, %s, %s)",
+                        (user_id, json.dumps([lecture_data]), datetime.utcnow())
+                    )
+                
+                conn.commit()
+                
+                return {
+                    'statusCode': 200,
+                    'headers': headers,
+                    'body': json.dumps({'success': True, 'message': 'Лекция отмечена как просмотренная'})
+                }
         
         elif method == 'GET':
             query_params = event.get('queryStringParameters') or {}
@@ -175,7 +219,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             cursor.execute(
                 """
                 SELECT u.id, u.email, u.full_name, u.created_at,
-                       up.test_results, up.completed_topics, up.last_activity
+                       up.test_results, up.completed_topics, up.viewed_lectures, up.last_activity
                 FROM users u
                 LEFT JOIN user_progress up ON u.id = up.user_id
                 WHERE u.id = %s
@@ -202,6 +246,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                         'created_at': user['created_at'].isoformat(),
                         'test_results': user['test_results'] or [],
                         'completed_topics': user['completed_topics'] or [],
+                        'viewed_lectures': user['viewed_lectures'] or [],
                         'last_activity': user['last_activity'].isoformat() if user['last_activity'] else None
                     }
                 })

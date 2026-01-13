@@ -20,12 +20,14 @@ const Index = () => {
   const [userAnswers, setUserAnswers] = useState<number[]>([]);
   const [showResult, setShowResult] = useState(false);
   const [selectedLecture, setSelectedLecture] = useState<{title: string; content: string; duration: string} | null>(null);
+  const [lectureViewTimer, setLectureViewTimer] = useState<NodeJS.Timeout | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userName, setUserName] = useState('');
   const [userProgress, setUserProgress] = useState({
     testsCompleted: 0,
     averageScore: 0,
-    testResults: []
+    testResults: [],
+    viewedLectures: []
   });
   const [loadingProgress, setLoadingProgress] = useState(false);
   const [materials, setMaterials] = useState<any[]>([]);
@@ -53,6 +55,15 @@ const Index = () => {
     }
   }, [navigate]);
 
+  // Cleanup timer on unmount
+  useEffect(() => {
+    return () => {
+      if (lectureViewTimer) {
+        clearTimeout(lectureViewTimer);
+      }
+    };
+  }, [lectureViewTimer]);
+
   const loadUserProgress = async (token: string) => {
     setLoadingProgress(true);
     try {
@@ -75,7 +86,8 @@ const Index = () => {
         setUserProgress({
           testsCompleted,
           averageScore,
-          testResults
+          testResults,
+          viewedLectures: data.user.viewed_lectures || []
         });
       }
     } catch (error) {
@@ -105,6 +117,51 @@ const Index = () => {
     } finally {
       setLoadingMaterials(false);
     }
+  };
+
+  const markLectureAsViewed = async (lecture: {title: string; duration: string}) => {
+    const token = localStorage.getItem('auth_token');
+    if (!token) return;
+
+    try {
+      await fetch('https://functions.poehali.dev/6f04f0e4-6b9b-4b83-9359-a67eb64cd803', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Auth-Token': token
+        },
+        body: JSON.stringify({
+          action: 'mark_lecture_viewed',
+          title: lecture.title,
+          duration: lecture.duration
+        })
+      });
+      
+      // Reload progress to update stats
+      loadUserProgress(token);
+    } catch (error) {
+      console.error('Ошибка при отметке лекции:', error);
+    }
+  };
+
+  const handleLectureOpen = (lecture: {title: string; content: string; duration: string}) => {
+    setSelectedLecture(lecture);
+    
+    // Auto-mark as viewed after 10 seconds of viewing
+    const timer = setTimeout(() => {
+      markLectureAsViewed(lecture);
+    }, 10000); // 10 seconds
+    
+    setLectureViewTimer(timer);
+  };
+
+  const handleLectureClose = () => {
+    // Clear timer if user closes before 10 seconds
+    if (lectureViewTimer) {
+      clearTimeout(lectureViewTimer);
+      setLectureViewTimer(null);
+    }
+    setSelectedLecture(null);
   };
 
   const testQuestions = [
@@ -1603,11 +1660,13 @@ P_max = I²R = 2² × 3 = 12 Вт
               <Card className="p-6 hover:shadow-xl transition-all hover:scale-105">
                 <div className="flex items-center gap-4 mb-4">
                   <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-secondary/30 to-secondary/20 flex items-center justify-center shadow-md">
-                    <Icon name="TrendingUp" className="text-secondary" size={24} />
+                    <Icon name="BookOpen" className="text-secondary" size={24} />
                   </div>
                   <div>
-                    <div className="text-3xl font-bold">{studentStats.strongSubjects.length}</div>
-                    <div className="text-sm text-muted-foreground">Сильных раздела</div>
+                    <div className="text-3xl font-bold">
+                      {isAuthenticated ? userProgress.viewedLectures.length : 0}
+                    </div>
+                    <div className="text-sm text-muted-foreground">Лекций просмотрено</div>
                   </div>
                 </div>
               </Card>
@@ -1676,21 +1735,33 @@ P_max = I²R = 2² × 3 = 12 Вт
                             <Icon name="BookOpen" size={16} className="text-primary" />
                             <span className="text-sm font-semibold">Рекомендуемые лекции:</span>
                           </div>
-                          {rec.lectures.map((lecture, lectureIndex) => (
+                          {rec.lectures.map((lecture, lectureIndex) => {
+                            const isViewed = isAuthenticated && userProgress.viewedLectures.some((v: any) => v.title === lecture.title);
+                            return (
                             <button
                               key={lectureIndex}
-                              onClick={() => setSelectedLecture({
+                              onClick={() => handleLectureOpen({
                                 title: lecture.title,
                                 content: lecture.content,
                                 duration: lecture.duration
                               })}
-                              className="block w-full p-3 rounded-lg bg-card border border-border hover:border-primary/50 hover:shadow-md transition-all group text-left"
+                              className={`block w-full p-3 rounded-lg border hover:shadow-md transition-all group text-left ${
+                                isViewed 
+                                  ? 'bg-secondary/10 border-secondary/30 hover:border-secondary/50' 
+                                  : 'bg-card border-border hover:border-primary/50'
+                              }`}
                             >
                               <div className="flex items-start justify-between gap-3">
                                 <div className="flex-1">
                                   <div className="flex items-center gap-2 mb-1">
-                                    <Icon name="Play" size={14} className="text-primary group-hover:text-secondary transition-colors" />
-                                    <span className="font-medium text-sm group-hover:text-primary transition-colors">{lecture.title}</span>
+                                    {isViewed ? (
+                                      <Icon name="CheckCircle2" size={14} className="text-secondary" />
+                                    ) : (
+                                      <Icon name="Play" size={14} className="text-primary group-hover:text-secondary transition-colors" />
+                                    )}
+                                    <span className={`font-medium text-sm ${isViewed ? 'text-secondary' : 'group-hover:text-primary'} transition-colors`}>
+                                      {lecture.title}
+                                    </span>
                                   </div>
                                   <p className="text-xs text-muted-foreground">{lecture.description}</p>
                                 </div>
@@ -1700,7 +1771,8 @@ P_max = I²R = 2² × 3 = 12 Вт
                                 </Badge>
                               </div>
                             </button>
-                          ))}
+                            );
+                          })}
                         </div>
                       )}
                     </div>
@@ -2108,12 +2180,16 @@ P_max = I²R = 2² × 3 = 12 Вт
                         <div className="text-xs text-muted-foreground mt-1">Средний балл</div>
                       </div>
                       <div className="text-center p-4 rounded-lg bg-muted/50">
-                        <div className="text-2xl font-bold text-green-600">142</div>
-                        <div className="text-xs text-muted-foreground mt-1">Часов обучения</div>
+                        <div className="text-2xl font-bold text-green-600">
+                          {isAuthenticated ? userProgress.viewedLectures.length : 0}
+                        </div>
+                        <div className="text-xs text-muted-foreground mt-1">Лекций просмотрено</div>
                       </div>
                       <div className="text-center p-4 rounded-lg bg-muted/50">
-                        <div className="text-2xl font-bold text-orange-600">18</div>
-                        <div className="text-xs text-muted-foreground mt-1">Достижений</div>
+                        <div className="text-2xl font-bold text-orange-600">
+                          {isAuthenticated ? userProgress.testsCompleted + userProgress.viewedLectures.length : 0}
+                        </div>
+                        <div className="text-xs text-muted-foreground mt-1">Всего активностей</div>
                       </div>
                     </div>
                   </div>
@@ -2225,6 +2301,49 @@ P_max = I²R = 2² × 3 = 12 Вт
               </div>
               </div>
             </Card>
+
+            {isAuthenticated && userProgress.viewedLectures.length > 0 && (
+              <Card className="p-6 relative overflow-hidden">
+                <div className="absolute inset-0 opacity-10 pointer-events-none">
+                  <img 
+                    src="https://cdn.poehali.dev/projects/2340c444-1239-4e7b-b126-c7cce6b9f819/files/4cb89443-4972-46d4-b6c0-5d01313e7652.jpg" 
+                    alt="" 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="relative z-10">
+                  <h3 className="font-bold text-xl mb-6 flex items-center gap-2">
+                    <Icon name="BookCheck" className="text-secondary" size={24} />
+                    Просмотренные лекции
+                  </h3>
+                  <div className="space-y-3 max-h-96 overflow-y-auto">
+                    {userProgress.viewedLectures.map((lecture: any, index: number) => (
+                      <div key={index} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg border border-border">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-lg bg-secondary/20 flex items-center justify-center">
+                            <Icon name="Check" className="text-secondary" size={16} />
+                          </div>
+                          <div>
+                            <div className="font-medium text-sm">{lecture.title}</div>
+                            <div className="text-xs text-muted-foreground">
+                              {new Date(lecture.viewed_at).toLocaleDateString('ru-RU', {
+                                day: 'numeric',
+                                month: 'short',
+                                year: 'numeric'
+                              })}
+                            </div>
+                          </div>
+                        </div>
+                        <Badge variant="outline" className="text-xs">
+                          <Icon name="Clock" size={12} className="mr-1" />
+                          {lecture.duration}
+                        </Badge>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </Card>
+            )}
 
             <div className="grid md:grid-cols-2 gap-6">
               <Card className="p-6 relative overflow-hidden">
@@ -2441,8 +2560,14 @@ P_max = I²R = 2² × 3 = 12 Вт
       </div>
 
       {selectedLecture && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
-          <Card className="w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl">
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in"
+          onClick={handleLectureClose}
+        >
+          <Card 
+            className="w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="flex items-center justify-between p-6 border-b bg-gradient-to-r from-primary/10 to-secondary/10">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-md">
@@ -2459,7 +2584,7 @@ P_max = I²R = 2² × 3 = 12 Вт
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => setSelectedLecture(null)}
+                onClick={handleLectureClose}
                 className="rounded-full hover:bg-destructive/10 hover:text-destructive"
               >
                 <Icon name="X" size={24} />
@@ -2492,8 +2617,16 @@ P_max = I²R = 2² × 3 = 12 Вт
               </div>
             </div>
             <div className="p-6 border-t bg-muted/30">
+              {isAuthenticated && !userProgress.viewedLectures.some((v: any) => v.title === selectedLecture.title) && (
+                <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg flex items-center gap-2">
+                  <Icon name="Info" size={16} className="text-blue-600 flex-shrink-0" />
+                  <span className="text-sm text-blue-800">
+                    Лекция будет автоматически отмечена как просмотренная через 10 секунд
+                  </span>
+                </div>
+              )}
               <Button
-                onClick={() => setSelectedLecture(null)}
+                onClick={handleLectureClose}
                 className="w-full"
                 size="lg"
               >
