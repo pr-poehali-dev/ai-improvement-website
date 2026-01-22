@@ -13,6 +13,7 @@ import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Toolti
 const Index = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('home');
+  const [selectedTest, setSelectedTest] = useState<number | null>(null);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [testStarted, setTestStarted] = useState(false);
@@ -164,7 +165,26 @@ const Index = () => {
     setSelectedLecture(null);
   };
 
-  const testQuestions = [
+  const availableTests = [
+    {
+      id: 1,
+      title: 'Основы электротехники',
+      description: 'Постоянный ток, конденсаторы',
+      questionsCount: 10,
+      duration: 10,
+      topics: ['Электрические цепи постоянного тока', 'Конденсаторы']
+    },
+    {
+      id: 2,
+      title: 'Переменный ток',
+      description: 'Полный тест по цепям переменного тока',
+      questionsCount: 30,
+      duration: 25,
+      topics: ['Электрические цепи переменного тока']
+    }
+  ];
+
+  const allTestQuestions = [
     {
       question: 'Какой закон описывает соотношение напряжения, тока и сопротивления в цепи постоянного тока?',
       answers: ['Закон Ома', 'Закон Кирхгофа', 'Закон Джоуля-Ленца', 'Закон Фарадея'],
@@ -1785,7 +1805,10 @@ P_max = I²R = 2² × 3 = 12 Вт
     }
   ];
 
-  const handleStartTest = () => {
+  const handleStartTest = (testId?: number) => {
+    if (testId !== undefined) {
+      setSelectedTest(testId);
+    }
     setTestStarted(true);
     setTestCompleted(false);
     setCurrentQuestion(0);
@@ -1794,6 +1817,22 @@ P_max = I²R = 2² × 3 = 12 Вт
     setShowResult(false);
     setActiveTab('tests');
   };
+
+  const handleSelectTest = (testId: number) => {
+    setSelectedTest(testId);
+    handleStartTest(testId);
+  };
+
+  const getCurrentTestQuestions = () => {
+    if (selectedTest === null) return [];
+    
+    const test = availableTests.find(t => t.id === selectedTest);
+    if (!test) return [];
+    
+    return allTestQuestions.filter(q => test.topics.includes(q.topic));
+  };
+
+  const testQuestions = getCurrentTestQuestions();
 
   const handleAnswerSelect = (index: number) => {
     setSelectedAnswer(index);
@@ -1860,6 +1899,7 @@ P_max = I²R = 2² × 3 = 12 Вт
     setUserAnswers([]);
     setSelectedAnswer(null);
     setShowResult(false);
+    setSelectedTest(null);
   };
 
   return (
@@ -1945,7 +1985,7 @@ P_max = I²R = 2² × 3 = 12 Вт
                     Твой ИИ-помощник готов помочь улучшить успеваемость
                   </p>
                   <div className="flex gap-3 flex-wrap">
-                    <Button size="lg" className="gap-2" onClick={handleStartTest}>
+                    <Button size="lg" className="gap-2" onClick={() => setActiveTab('tests')}>
                       <Icon name="Play" size={20} />
                       Начать тест
                     </Button>
@@ -2197,8 +2237,8 @@ P_max = I²R = 2² × 3 = 12 Вт
           </TabsContent>
 
           <TabsContent value="tests" className="animate-fade-in">
-            {!testStarted ? (
-              <Card className="p-8 text-center bg-gradient-to-br from-card via-primary/5 to-secondary/10 shadow-lg relative overflow-hidden">
+            {!testStarted || selectedTest === null ? (
+              <Card className="p-8 bg-gradient-to-br from-card via-primary/5 to-secondary/10 shadow-lg relative overflow-hidden">
                 <div className="absolute inset-0 opacity-10 pointer-events-none">
                   <img 
                     src="https://cdn.poehali.dev/projects/2340c444-1239-4e7b-b126-c7cce6b9f819/files/4cb89443-4972-46d4-b6c0-5d01313e7652.jpg" 
@@ -2206,35 +2246,68 @@ P_max = I²R = 2² × 3 = 12 Вт
                     className="w-full h-full object-cover"
                   />
                 </div>
-                <div className="max-w-2xl mx-auto relative z-10">
-                  <div className="w-24 h-24 bg-gradient-to-br from-primary/20 to-secondary/10 rounded-full flex items-center justify-center mx-auto mb-6 shadow-md">
-                    <Icon name="ClipboardList" className="text-primary" size={48} />
+                <div className="max-w-4xl mx-auto relative z-10">
+                  <div className="text-center mb-8">
+                    <div className="w-24 h-24 bg-gradient-to-br from-primary/20 to-secondary/10 rounded-full flex items-center justify-center mx-auto mb-6 shadow-md">
+                      <Icon name="ClipboardList" className="text-primary" size={48} />
+                    </div>
+                    <h2 className="text-3xl font-bold mb-4">Выберите тест</h2>
+                    <p className="text-lg text-muted-foreground">
+                      Пройдите тестирование по разным темам электротехники
+                    </p>
                   </div>
-                  <h2 className="text-3xl font-bold mb-4">Готовы начать тест?</h2>
-                  <p className="text-lg text-muted-foreground mb-8">
-                    Тест содержит {testQuestions.length} вопросов. Выберите один правильный ответ для каждого вопроса.
-                  </p>
-                  <div className="grid md:grid-cols-3 gap-4 mb-8">
-                    <div className="p-4 bg-gradient-to-br from-primary/10 to-secondary/5 rounded-lg shadow-sm hover:shadow-md transition-shadow">
-                      <Icon name="HelpCircle" className="mx-auto mb-2 text-primary" size={32} />
-                      <div className="font-bold text-2xl">{testQuestions.length}</div>
-                      <div className="text-sm text-muted-foreground">Вопросов</div>
-                    </div>
-                    <div className="p-4 bg-gradient-to-br from-secondary/15 to-secondary/5 rounded-lg shadow-sm hover:shadow-md transition-shadow">
-                      <Icon name="Clock" className="mx-auto mb-2 text-secondary" size={32} />
-                      <div className="font-bold text-2xl">10</div>
-                      <div className="text-sm text-muted-foreground">Минут</div>
-                    </div>
-                    <div className="p-4 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-lg shadow-sm hover:shadow-md transition-shadow">
-                      <Icon name="Target" className="mx-auto mb-2 text-primary" size={32} />
-                      <div className="font-bold text-2xl">100</div>
-                      <div className="text-sm text-muted-foreground">Макс. баллов</div>
-                    </div>
+                  
+                  <div className="grid md:grid-cols-2 gap-6">
+                    {availableTests.map((test) => (
+                      <div
+                        key={test.id}
+                        className="p-6 rounded-lg border-2 border-border hover:border-primary/50 hover:shadow-lg transition-all bg-gradient-to-br from-card to-primary/5 cursor-pointer"
+                        onClick={() => handleSelectTest(test.id)}
+                      >
+                        <div className="flex items-start gap-4 mb-4">
+                          <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-primary/20 to-secondary/10 flex items-center justify-center flex-shrink-0">
+                            <Icon name="FileQuestion" className="text-primary" size={24} />
+                          </div>
+                          <div className="flex-1">
+                            <h3 className="font-bold text-xl mb-2">{test.title}</h3>
+                            <p className="text-sm text-muted-foreground mb-3">{test.description}</p>
+                          </div>
+                        </div>
+                        
+                        <div className="grid grid-cols-3 gap-3 mb-4">
+                          <div className="text-center p-3 bg-muted/50 rounded-lg">
+                            <Icon name="HelpCircle" className="mx-auto mb-1 text-primary" size={20} />
+                            <div className="font-bold text-lg">{test.questionsCount}</div>
+                            <div className="text-xs text-muted-foreground">Вопросов</div>
+                          </div>
+                          <div className="text-center p-3 bg-muted/50 rounded-lg">
+                            <Icon name="Clock" className="mx-auto mb-1 text-secondary" size={20} />
+                            <div className="font-bold text-lg">{test.duration}</div>
+                            <div className="text-xs text-muted-foreground">Минут</div>
+                          </div>
+                          <div className="text-center p-3 bg-muted/50 rounded-lg">
+                            <Icon name="Target" className="mx-auto mb-1 text-primary" size={20} />
+                            <div className="font-bold text-lg">100</div>
+                            <div className="text-xs text-muted-foreground">Баллов</div>
+                          </div>
+                        </div>
+                        
+                        <div className="flex flex-wrap gap-2 mb-4">
+                          {test.topics.map((topic, idx) => (
+                            <Badge key={idx} variant="outline" className="text-xs">
+                              {topic}
+                            </Badge>
+                          ))}
+                        </div>
+                        
+                        <Button className="w-full gap-2" size="lg">
+                          <Icon name="Play" size={18} />
+                          Начать тест
+                        </Button>
+                      </div>
+                    ))}
                   </div>
-                  <Button size="lg" className="gap-2" onClick={handleStartTest}>
-                    <Icon name="Play" size={20} />
-                    Начать тест
-                  </Button>
+                  
                   <div className="mt-12 pt-8 border-t border-border/50">
                     <img 
                       src="https://cdn.poehali.dev/projects/2340c444-1239-4e7b-b126-c7cce6b9f819/files/e0c31635-e447-42af-b0d8-1e0240f90c6b.jpg" 
