@@ -68,10 +68,7 @@ export default function Login() {
           </div>
           <h1 className="text-3xl font-bold mb-2">Вход в систему</h1>
           <p className="text-muted-foreground">Магистраль знаний</p>
-          <h1 className="text-3xl font-bold mb-2 text-[#e21a1a]">
-            Внимание! На сайте ведется обновление софта. Сайт будет доступен
-            02.02.2026
-          </h1>
+          <h1 className="text-3xl font-bold mb-2 text-[#e21a1a]">02.02.2026</h1>
         </div>
 
         <div className="bg-white rounded-2xl shadow-xl p-8 border border-border">
